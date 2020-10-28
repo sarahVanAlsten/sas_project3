@@ -1,3 +1,4 @@
+
 /*****************************************************************************
 	Name: Sarah Van Alsten, Tim Feeney, and Nandi Taylor
 	Program: EPID700_Project3_VanAlstenFeeneyTaylor.sas
@@ -21,6 +22,11 @@ macro variable after the %let to make sure the correct library is specified;
 *%LET libref = ;
 
 LIBNAME epid "&libref";
+
+**********************************************************************
+*PART 1: Reading in External Data Sets
+**********************************************************************;
+TITLE "PART 1";
 
 *read in the formA data;
 PROC IMPORT OUT= formA 
@@ -48,19 +54,52 @@ RUN;
 PROC IMPORT OUT= formC 
             DATAFILE= "&libref.\FormC.xlsx" 
             DBMS=EXCEL REPLACE;
+
      RANGE="FormC$"; 
      GETNAMES=YES;
      MIXED=NO;
      SCANTEXT=YES;
      USEDATE=YES;
      SCANTIME=YES;
+
 RUN;
 
-*read in kirowngeA text file;
-DATA kiro;
-	INFILE "&libref.\KirongweA.txt" MISSOVER FIRSTOBS = 2;
-	INPUT a_siteid 8-9 spotid 15-16 a11 $ 18-25 a17 & a18 & a19 & a20 & a21 a22 a23 a24 a_totalci;
+
+*•	In the FormC SAS data set, ensure that the DATE9. 
+format is assigned to the variable c2 and that the TIME. format is assigned to variable c3. ;
+DATA formC;
+SET formC;
+
+	FORMAT c2 DATE9.;
+	FORMAT c3 TIME.;
+
 RUN;
+
+
+*Question 2: In one step run a proc contents-esque procedure to
+get a sense of the datasets;
+*****************************************************************;
+PROC DATASETS;
+	CONTENTS DATA = _ALL_ DETAILS;
+RUN;
+
+
+
+
+
+***************************************************************************
+* PART 2
+****************************************************************************;
+
+
+	
+
+
+*read in kirowngeA text file;
+*DATA kiro;
+*	INFILE "&libref.\KirongweA.txt" MISSOVER FIRSTOBS = 2;
+*	INPUT a_siteid 8-9 spotid 15-16 a11 $ 18-25 a17 & a18 & a19 & a20 & a21 a22 a23 a24 a_totalci;
+*RUN;
 
 *check import done appropriately;
 PROC PRINT DATA = formA (OBS = 10);
@@ -72,5 +111,5 @@ RUN;
 PROC PRINT DATA = formC (OBS = 10);
 RUN;
 
-PROC PRINT DATA = kiro;
-RUN;
+*PROC PRINT DATA = kiro;
+*RUN;
