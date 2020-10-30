@@ -75,6 +75,16 @@ SET formC;
 
 RUN;
 
+*check import done appropriately;
+PROC PRINT DATA = formA (OBS = 10);
+RUN;
+
+PROC PRINT DATA = formB (OBS = 10);
+RUN;
+
+PROC PRINT DATA = formC (OBS = 10);
+RUN;
+
 
 *Question 2: In one step run a proc contents-esque procedure to
 get a sense of the datasets;
@@ -93,28 +103,39 @@ QUIT;
 ****************************************************************************;
 
 
+PROC SORT DATA = forma OUT = forma_sort;
+	BY a_siteid spotid;
+RUN;
+
+
+DATA CheckSpotIDs;
+SET forma_sort;
 	
+	BY a_siteid;
 
+	RETAIN id_check;
 
-*read in kirowngeA text file;
-*DATA kiro;
-*	INFILE "&libref.\KirongweA.txt" MISSOVER FIRSTOBS = 2;
-*	INPUT a_siteid 8-9 spotid 15-16 a11 $ 18-25 a17 & a18 & a19 & a20 & a21 a22 a23 a24 a_totalci;
-*RUN;
+		IF first.a_siteid THEN id_check = 1;
+			ELSE id_check = id_check + 1;
 
-*check import done appropriately;
-PROC PRINT DATA = formA (OBS = 10);
+		IF id_check NE spotid THEN DO;
+			flag_spotid = 1;
+			*reset the checker so it isn't off for whole thing;
+			id_check = spotid;
+
+		END; 
+
+		ELSE DO;
+			flag_spotid = 0;
+		END;
+
 RUN;
 
-PROC PRINT DATA = formB (OBS = 10);
+PROC FREQ DATA = checkSpotIDs;
+	TABLES flag_spotid * a_siteid;
 RUN;
 
-PROC PRINT DATA = formC (OBS = 10);
-RUN;
-
-*PROC PRINT DATA = kiro;
-*RUN;
-
+	
 
 ***************************************************************************
 * PART 3
@@ -133,8 +154,28 @@ and this revised data file.;
 *1.	First, read the “KirongweA.txt” data file in as a SAS data set. Name your new SAS
 data set KirongweA.; 
 
+
+*read in kirowngeA text file;
+DATA kiro;
+	INFILE "&libref.\KirongweA.txt" MISSOVER FIRSTOBS = 2;
+	INPUT a_siteid 8-9 spotid 15-16 a11 $ 18-25 a17 & a18 & a19 & a20 & a21 a22 a23 a24 a_totalci;
+RUN;
+
+*check import;
+PROC PRINT DATA = kiro;
+RUN;
+
+
 *2.	To facilitate the comparison of the data files, sort both the KirongweA and FormA
 data sets in order of ascending spotid.;
+
+PROC SORT DATA = kirongweA OUT = kirongweA_sort;
+	BY spotid;
+RUN;
+
+PROC SORT DATA = formA OUT = formA_new_sort;
+	BY spotid;
+RUN;
 
 
 *3.	Using one PROC (not a DATA) step, compare the KirongweA SAS data set to the subset
