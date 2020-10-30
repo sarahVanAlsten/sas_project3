@@ -82,6 +82,7 @@ get a sense of the datasets;
 PROC DATASETS;
 	CONTENTS DATA = _ALL_ DETAILS;
 RUN;
+QUIT;
 
 
 
@@ -113,3 +114,4 @@ RUN;
 
 *PROC PRINT DATA = kiro;
 *RUN;
+*added code!
