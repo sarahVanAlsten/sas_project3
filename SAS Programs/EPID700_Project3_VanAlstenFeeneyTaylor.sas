@@ -16,7 +16,7 @@ macro variable after the %let to make sure the correct library is specified;
 %LET libref = C:\Users\Owner\OneDrive\Documents\UNC\CourseWork\FALL2020\EPID700\Projects\project3\sas_project3\Data;
 
 *for Tim's library;
-%LET libref = z:\\OneDrive - University of North Carolina at Chapel Hill\PhD Courses\EPID 700\Project 3\sas_project3\Data;
+*%LET libref = z:\\OneDrive - University of North Carolina at Chapel Hill\PhD Courses\EPID 700\Project 3\sas_project3\Data;
 
 *for Nandi's library;
 *%LET libref = ;
@@ -101,7 +101,7 @@ QUIT;
 ***************************************************************************
 * PART 2
 ****************************************************************************;
-
+TITLE "Part 2";
 
 PROC SORT DATA = forma OUT = forma_sort;
 	BY a_siteid spotid;
@@ -140,7 +140,7 @@ RUN;
 ***************************************************************************
 * PART 3
 ****************************************************************************;
-
+TITLE "Part 3";
 
 * Identifying Discrepancies in Double-entered Data
 You determine that the error in the cross-border site Kirongwe
@@ -156,13 +156,13 @@ data set KirongweA.;
 
 
 *read in kirowngeA text file;
-DATA kiro;
+DATA kirongweA;
 	INFILE "&libref.\KirongweA.txt" MISSOVER FIRSTOBS = 2;
-	INPUT a_siteid 8-9 spotid 15-16 a11 $ 18-25 a17 & a18 & a19 & a20 & a21 a22 a23 a24 a_totalci;
+	INPUT a_siteid 7-9 spotid 14-16 a11 $ 18-25 a17 & a18 & a19 & a20 & a21 a22 a23 a24 a_totalci;
 RUN;
 
 *check import;
-PROC PRINT DATA = kiro;
+PROC PRINT DATA = kirongweA;
 RUN;
 
 
@@ -187,19 +187,30 @@ are judged equal). Be sure to examine your log after running the PROC. (As desir
 free to explore any other options for the PROC you use to create this data set.);
 
 
+PROC COMPARE  BASE= formA_new_sort COMPARE= kirongweA_sort OUT = kcompare;
+   WHERE a_siteid = 20;
+RUN;
+
 *Question 5. What procedure did you use to create the kcompare data set?
 (Enter only one word.) PROC ;
 
+*compare;
 
 *4.	Print your kcompare data set. Take a close look at the data, noting which observations 
 are from the original FormA data set and which are from the re-keyed KirongweA data. Based on
 what you see in kcompare, consider what might have gone wrong during assignment of the Spot
 IDs in the Form A data set;
 
+
+PROC PRINT DATA = kcompare;
+RUN;
+
 *Question 6. Other than the spotid variable, are there any other variables in the two data
 sets that have with inconsistent values between the FormA data vs. KirongweA? Assume that the
 KirongweA data set and the FormA data for Kirongwe contain data for the same set of spots 
 (i.e., there are no missing or repeated records). Yes/No;
+
+*YES;
 
 
 *At your request, the Kirongwe supervisor verifies all discrepant values against the paper-based
@@ -209,9 +220,13 @@ correct ones.
 5. Delete the original Kirongwe records from the FormA data set, and replace them with the records
 from KirongweA. Name your new and improved FormA data set FormA2.;
 
+DATA FormA2;
+SET FormA (WHERE= (a_siteid NE 20)) KirongweA;
+RUN;
 
 *Question 7. How many observations are in your FormA2 data set? ;
 
+*1769;
 
 ***************************************************************************
 * PART 4
