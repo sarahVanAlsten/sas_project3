@@ -254,8 +254,8 @@ want to copy/paste;
 	wanted to check that I could replicate in SAS;
 	
 	*first make them character;
-	siteid_new = STRIP(PUT(a_siteid, 3.));
-	spotid_new = STRIP(PUT(spotid, 3.));
+	siteid_new = STRIP(PUT(&site, 3.));
+	spotid_new = STRIP(PUT(&spot, 3.));
 
 
 	DO i = 1 TO 3;
@@ -277,40 +277,60 @@ want to copy/paste;
 	*finally, paste strings w/ appropriate digits;
 	sitespotid = CATS(siteid_new, SUBSTR(&country, 1, 1), "-", spotid_new);
 
+	*check on missingness;
+	IF (&country = "") OR (PUT(&site,3.) = .) OR  (PUT(&spot,3.) = .) THEN sitespotid = " ";
+		ELSE sitespotid = sitespotid;
+
 %MEND;
 
 
 DATA formA3;
 SET formA2;
 
-	%makeID(siteid_new, a11, spotid_new);
+	%makeID(a_siteid, a11, spotid);
 	
 RUN;
 
 DATA formB2;
 SET formB;
 
-		%makeID(siteid_new, a11, spotid_new);
+		LENGTH country $ 10;
+		
+		IF b3 = 1 THEN country = "Kenya";
+			ELSE IF b3 = 2 THEN country = "Rwanda";
+			ELSE IF b3 = 3 THEN country = "Tanzania";
+			ELSE IF b3 = 4 THEN country = "Uganda";
+
+		%makeID(b4, country, b5);
 
 RUN;
 
 DATA formC2;
 SET formC;
 
-		%makeID(siteid_new, a11, spotid_new);
+		LENGTH country $ 10;
+
+		IF c4 = 1 THEN country = "Kenya";
+			ELSE IF c4 = 2 THEN country = "Rwanda";
+			ELSE IF c4 = 3 THEN country = "Tanzania";
+			ELSE IF c4 = 4 THEN country = "Uganda";
+
+		%makeID(c5, country, c6);
 
 RUN;
 
 *check code;
-PROC PRINT DATA = formA3;
+PROC PRINT DATA = formA3 (OBS = 10);
 	VAR sitespotid a_siteid a11 spotid;
 RUN;
 
 PROC PRINT DATA = formB2 (OBS = 10);
-	VAR sitespotid a_siteid a11 spotid;
+	VAR sitespotid b4 b5 country;
 RUN;
 
-
+PROC PRINT DATA = formC (OBS = 10);
+	VAR sitespotid c5 c6 country;
+RUN;
 
 
 *2.	Write one macro called idcheck that can be applied to any data set (FormA3, FormB2, or FormC2) to 
@@ -323,6 +343,37 @@ b.	Print all records with missing sitespotid values.;
 *3.	Call the idcheck macro you wrote to check for missing sitespotid values in each of your new data sets:
 FormA3, FormB2, and FormC2.;
 
+%MACRO idcheck(data);
+
+	%IF data = FormA3 %THEN %DO;
+		%LET countvar = a11;
+		%LET sitevar = a_siteid;
+		%LET spotvar = spotid;
+	%END;
+
+	%ELSE %IF data = FormB2 %THEN %DO;
+		%LET countvar = country;
+		%LET sitevar = b4;
+		%LET spotvar = b5;
+
+	%END;
+
+	%ELSE %DO;
+		%LET countvar = country;
+		%LET sitevar = c5;
+		%LET spotvar = c6;
+
+	%END;
+
+	*check the coding;
+
+	*print records where missing;
+	PROC PRINT DATA = &data;
+		WHERE sitespotid = "";
+	RUN;
+
+
+%MEND;
 
 *Question 8. Across FormA3, FormB2, and FormC2, how many observations have a missing value for sitespotid?;
 
