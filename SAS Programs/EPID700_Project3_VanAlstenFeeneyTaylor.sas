@@ -585,25 +585,84 @@ had excluded the BY statement in the DATA step you wrote in Part V.1?
 A.	
 B.	No 
 
-
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-
-
 ***************************************************************************
 * PART 6
 ****************************************************************************;
 
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
+/*Part VI. Applying Labels and Formats
+Creating labels and user-defined formats for a large data set can be cumbersome.
+Fortunately, a colleague has shared two SAS program files for these tasks: “CBIHSApplyLF.sas” 
+and “CBIHSFormats.sas.”
+
+1.	Open these two SAS programs just to see what they contain. 
+Exit the files once you have an understanding of their contents. 
+(Do not run any code while you have these program files open in SAS.)
+
+2.	Return to your SAS program for Project 3. Write and 
+execute exactly one statement in your SAS program that will execute all the code in the
+“CBIHSFormats.sas” file.
+*/
+
+*file pointer -> update the base filepath;
+DATA _NULL_;
+	CALL SYMPUT('newlibref', TRANWRD("&libref", "\Data", "\SAS Programs"));
+RUN;
+
+%INCLUDE "&newlibref.\CBIHSFormats.sas";
+
+/*Question 14. What statement did you use to execute the code in the “CBIHSFormats.sas” file? 
+Enter the SAS keyword for the statement 
+(enter one word, including any relevant special characters): %INCLUDE */
+
+/*3.	In a new DATA step, use one statement to execute the contents of “CBIHSApplyLF.sas.”
+(Do not copy/paste the formats and labels into your Project 3 code.) 
+a.	Name the output data set ABC2.
+b.	Do not worry if the log alerts you to variables that are not included in your subset
+of the CBIHS data.
+*/
+
+DATA ABC2;
+SET ABC;
+
+	%INCLUDE "&newlibref.\CBIHSApplyLF.sas";
+
+RUN;
+
+
+/*Question 15. How many statements did you write in your Project 3 SAS program to accomplish 
+Step VI.3? (Be sure to include the DATA and RUN statements in your count.) 4*/
+
+
+/*
+4.	Inspect the variables attributes in your new data set, ABC2.
+*/
+PROC CONTENTS DATA = ABC2;
+RUN;
+
+/*Question 16. How many of the 88 variables in ABC2 do not have a label? (In your count, 
+include only variables for which the label attribute is completely empty/blank.) 2 */
+
+
+/*5.	In a new DATA step, create an output data set named ABC3 in which you:
+a.	Assign informative variable labels to any yet-unlabeled variables (as identified
+in Question 16). Remember: you have been given the questionnaires that show the questions
+associated with each variable.
+b.	Assign the format CBSITE_REVISED. (you loaded this format into the WORK library in 
+Step VI.2) to the variable a_siteid.
+*/
+
+DATA ABC3;
+SET ABC2;
+
+
+	LABEL sitespotid = "Two Digit Cross-border site ID, First Letter Country, 3 Digit Spot ID";
+	LABEL b20 = "Years Spot in Operation";
+
+
+	FORMAT a_siteid CBSITE_REVISED.;
+
+RUN;
+
 /**/
 /**/
 /**/
