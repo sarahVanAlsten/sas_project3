@@ -243,6 +243,75 @@ a.	Assign sitespotid values according to the following structure:
 sets FormA3, FormB2, and FormC2 (based on the input data sets FormA2, FormB, and FormC, respectively).;
 
 
+*make a macro to do this since we'll be reusing the code multiple times and don't
+want to copy/paste;
+%MACRO makeID(site, country, spot);
+
+	*cross border site ids and spotids don't automatically have 2 or 3 digits, respectively;
+	*loop over them and if they don't have appropriate numbers of digits, add 0 to start;
+	*Note from Sarah-> I did it this way because of past experiences w/ similar things where
+	there were many more than 3 digits and it would be annoying to type all possibilities. Just
+	wanted to check that I could replicate in SAS;
+	
+	*first make them character;
+	siteid_new = STRIP(PUT(a_siteid, 3.));
+	spotid_new = STRIP(PUT(spotid, 3.));
+
+
+	DO i = 1 TO 3;
+		*applies to both variables;
+		IF i NE 3 THEN DO;
+			IF lengthn(siteid_new) < i THEN siteid_new = CATS("0", siteid_new);
+				ELSE siteid_new = siteid_new;
+			IF lengthn(spotid_new) < i THEN spotid_new = CATS("0", spotid_new);
+				ELSE spotid_new = spotid_new;
+		END;
+		*applies only to spotid;
+		ELSE DO;
+			IF lengthn(spotid_new) < i THEN spotid_new = CAT("0", spotid_new);
+				ELSE spotid_new = spotid_new;
+
+		END;
+	END;
+
+	*finally, paste strings w/ appropriate digits;
+	sitespotid = CATS(siteid_new, SUBSTR(&country, 1, 1), "-", spotid_new);
+
+%MEND;
+
+
+DATA formA3;
+SET formA2;
+
+	%makeID(siteid_new, a11, spotid_new);
+	
+RUN;
+
+DATA formB2;
+SET formB;
+
+		%makeID(siteid_new, a11, spotid_new);
+
+RUN;
+
+DATA formC2;
+SET formC;
+
+		%makeID(siteid_new, a11, spotid_new);
+
+RUN;
+
+*check code;
+PROC PRINT DATA = formA3;
+	VAR sitespotid a_siteid a11 spotid;
+RUN;
+
+PROC PRINT DATA = formB2 (OBS = 10);
+	VAR sitespotid a_siteid a11 spotid;
+RUN;
+
+
+
 
 *2.	Write one macro called idcheck that can be applied to any data set (FormA3, FormB2, or FormC2) to 
 perform the following tasks:
