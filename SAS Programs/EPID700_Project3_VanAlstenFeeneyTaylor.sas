@@ -250,8 +250,8 @@ want to copy/paste;
 	*cross border site ids and spotids don't automatically have 2 or 3 digits, respectively;
 	*loop over them and if they don't have appropriate numbers of digits, add 0 to start;
 	*Note from Sarah-> I did it this way because of past experiences w/ similar things where
-	there were many more than 3 digits and it would be annoying to type all possibilities. Just
-	wanted to check that I could replicate in SAS;
+	there were many more than 3 digits and it would be annoying to type all possibilities. This
+	is more generalizable if we had, say 50 character long variables etc;
 	
 	*first make them character;
 	siteid_new = STRIP(PUT(&site, 3.));
@@ -516,11 +516,76 @@ B.	No;
 * PART 5
 ****************************************************************************;
 
-/**/
-/**/
-/**/
-/**/
-/**/
+/*Now that you’ve created a common variable sitespotid uniquely identifying spots across
+the three data sets (FormA3, FormB2, and FormC2), you’re ready to merge all the records together,
+spot-by-spot.
+
+1.Merge the FormA3, FormB2, and FormC2 data together by sitespotid to create an output 
+data set called ABC according to the following instructions:*/
+
+/* a. Keep all records from the FormC2 data, and link, onto each of the FormC2 records, 
+the corresponding spot-level records from the FormA3 and FormB2 data sets. */
+
+/*b.	Exclude, from the ABC data set, any observations that appear in FormA3 or
+FormB2 which do not have their sitespotid represented in the FormC2 data set.
+(In other words, only include records for the spots where bio-behavioral interviews occurred.
+Exclude all spot data for spots where bio-behavioral interviews did not occur.)*/
+
+/*c.	For spots where multiple bio-behavioral interviews were conducted, merge the
+FormA3 and FormB2 data sets for that spot onto every bio-behavioral interview record from that spot.
+(For example, if 6 people were interviewed at a spot with sitespotid 01K-033, you should have
+6 records in the ABC data set – one per Form C interview –
+and each of those 6 records should include 01K-033’s spot-level data from FormA3 and FormB2.)*/
+
+
+/*d.	Output only the following variables to the ABC data set:
+a11 a17 a18 a19 a20 a21 a22 a23 a24 a_siteid a_totalci 
+b1 b3 b4 b5 b15 b16 b17 b18 b19 b20 b23 b24 b29 b30 b49 b50 b10a b14a
+b14b b14c b14d b14e b14f b52a b52b b52c b52d b9a b9b c1 c2 c3 c4 c5 c6 c12
+c13 c14 c15 c16 c18 c19 c21 c22 c23 c24 c25 c32 c84 c85 c116 c10a c10b c10c
+c10d c117b c117c c11a c120a c120b c120c c120d c120e c120f c120g c120h c17a c20a
+c20b c20c c29a c29b c34a c34b_v1 c34b_v2 sitespotid spotid
+*/
+
+PROC SORT DATA = formC2 OUT = formC2_sort;
+	BY sitespotid;
+RUN;
+
+PROC SORT DATA = formB2 OUT = formB2_sort;
+	BY sitespotid;
+RUN;
+
+PROC SORT DATA = formA3 OUT = formA3_sort;
+	BY sitespotid;
+RUN;
+
+DATA ABC;
+	MERGE FormC2_sort (IN = c) FormA3_sort FormB2_sort;
+	BY sitespotid;
+	IF c;
+
+	KEEP a11 a17 a18 a19 a20 a21 a22 a23 a24 a_siteid a_totalci 
+		  b1 b3 b4 b5 b15 b16 b17 b18 b19 b20 b23 b24 b29 b30 b49 b50 b10a b14a
+		  b14b b14c b14d b14e b14f b52a b52b b52c b52d b9a b9b c1 c2 c3 c4 c5 c6 c12
+		  c13 c14 c15 c16 c18 c19 c21 c22 c23 c24 c25 c32 c84 c85 c116 c10a c10b c10c
+		  c10d c117b c117c c11a c120a c120b c120c c120d c120e c120f c120g c120h c17a c20a
+		  c20b c20c c29a c29b c34a c34b_v1 c34b_v2 sitespotid spotid;
+RUN;
+
+
+*2.	Verify that your output data set ABC contains the correct number of variables (it should have 88).;
+PROC CONTENTS DATA = ABC;
+RUN;
+
+*Question 12. How many observations are in your ABC data set?
+(Be sure you’ve followed the Step V.1 instructions carefully!) 11567 
+
+Question 13. Would SAS have produced an output data set if you
+had excluded the BY statement in the DATA step you wrote in Part V.1? 
+A.	
+B.	No 
+
+
 /**/
 /**/
 /**/
