@@ -270,8 +270,8 @@ want to copy/paste;
 		ELSE DO;
 			IF lengthn(spotid_new) < i THEN spotid_new = CAT("0", spotid_new);
 				ELSE spotid_new = spotid_new;
-
 		END;
+
 	END;
 
 	*finally, paste strings w/ appropriate digits;
@@ -328,7 +328,7 @@ PROC PRINT DATA = formB2 (OBS = 10);
 	VAR sitespotid b4 b5 country;
 RUN;
 
-PROC PRINT DATA = formC (OBS = 10);
+PROC PRINT DATA = formC2 (OBS = 10);
 	VAR sitespotid c5 c6 country;
 RUN;
 
@@ -342,38 +342,95 @@ b.	Print all records with missing sitespotid values.;
 
 *3.	Call the idcheck macro you wrote to check for missing sitespotid values in each of your new data sets:
 FormA3, FormB2, and FormC2.;
+options mprint mlogic;
+
 
 %MACRO idcheck(data);
 
-	%IF data = FormA3 %THEN %DO;
+
+	*first, depending on the input dataset define which are
+	the variables to compare against;
+	%IF &data. = FormA3 %THEN %DO;
 		%LET countvar = a11;
 		%LET sitevar = a_siteid;
 		%LET spotvar = spotid;
 	%END;
 
-	%ELSE %IF data = FormB2 %THEN %DO;
+	%ELSE %IF &data. = FormB2 %THEN %DO;
 		%LET countvar = country;
 		%LET sitevar = b4;
 		%LET spotvar = b5;
 
 	%END;
 
-	%ELSE %DO;
+	%ELSE %IF &data. = FormC3 %THEN %DO;
 		%LET countvar = country;
 		%LET sitevar = c5;
 		%LET spotvar = c6;
 
 	%END;
 
-	*check the coding;
+	%PUT countvar is &countvar;
+	%PUT sitevar is &sitevar;
+	%PUT spotvar is &spotvar;
 
-	*print records where missing;
-	PROC PRINT DATA = &data;
+	*check the coding;
+	DATA &data.idcheck;
+	SET &data.;
+
+		*extract the characters for the site;
+		site2 = SUBSTR(sitespotid, 1, 2);
+
+		*for the country;
+		country1 = SUBSTR(sitespotid, 3, 1);
+
+		*for the hyphen;
+		hyph1 = SUBSTR(sitespotid, 4, 1);
+
+		*for the spot;
+		spot3 = SUBSTR(sitespotid, 5, 3);
+
+		*if either of these don't match, then flag and stop because we know
+		there will be an issue;
+		IF (hyph1 NE "-") OR (country1 NE SUBSTR(&countvar,1,1)) THEN flagID = 1;
+			ELSE DO; *otherwise keep checking;
+
+
+		*because of way we coded 0s in front of digits, cant
+		directly compare the spot3 and site2 variables to the originals. Need
+		to get rid of any leading 0s first. There will be max of 2 0's in front, hence
+		do i = 1 to 2. If first char is a 0, make the variable that same string minus the 0 in front;
+			DO i = 1 TO 2;
+					IF SUBSTR(spot3, 1, 1) = '0' THEN spot3 = SUBSTR(spot3, 2, lengthn(spot3)-1);
+						ELSE spot3 = spot3;
+
+					IF SUBSTR(site2, 1, 1) = '0' THEN site2 = SUBSTR(site2, 2, lengthn(site2)-1);
+						ELSE site2 = site2;
+
+				END;
+			END;
+
+		*now that zeros are removed we can compare;
+		IF flagID = 1 OR 
+			(STRIP(PUT(&spotvar,3.)) NE spot3) OR
+				(STRIP(PUT(&sitevar,3.)) NE site2) THEN flagID = 1;
+		RUN;
+
+	*print any problematic ones;
+	PROC PRINT DATA = &data.idcheck;
+		WHERE flagID = 1;
+	RUN;
+
+	*print records where missing sitespotid;
+	PROC PRINT DATA = &data. ;
 		WHERE sitespotid = "";
 	RUN;
 
-
 %MEND;
+
+%idcheck(data=FormA3);
+%idcheck(data=FormB2);
+%idcheck(data=FormC2);
 
 *Question 8. Across FormA3, FormB2, and FormC2, how many observations have a missing value for sitespotid?;
 
@@ -384,35 +441,73 @@ a.	Consider the DATA steps you wrote in Step IV.1. Modify the DATA step(s) that 
 and FormC2 data sets as needed to assign an appropriate (non-missing) sitespotid value to any record where
 sitespotid was found to be missing.
 
+*sitespotid missing for obs 5037 in formc2. It's missing data for c4 (country) but we know
+that the site is 7 (Isebania/Sirare) and spot is 81. Find out what country that is;
+
+PROC PRINT DATA = formA3;
+	WHERE a_siteid = 7 AND spotid=81;
+RUN;
+
+PROC PRINT DATA = formB2;
+	WHERE b4 = 7 AND b5=81;
+RUN;
+
+*Form A and Form B suggest that site 7, spot 81 is in Kenya. Change form C missing
+to accomodate this
 a.	If you hard-code or overwrite any values, add comments to your code stating the original value(s) and
 providing your rationale for the new value assigned.;
+DATA formC2;
+SET formC;
+
+		LENGTH country $ 10;
+
+		IF c4 = 1 THEN country = "Kenya";
+			ELSE IF c4 = 2 THEN country = "Rwanda";
+			ELSE IF c4 = 3 THEN country = "Tanzania";
+			ELSE IF c4 = 4 THEN country = "Uganda";
+			ELSE IF c4 = . AND c5 = 7 AND c6 = 81 THEN country = "Kenya";
+
+		%makeID(c5, country, c6);
+
+RUN;
 
 *b.	Call the idcheck macro again for any updated data set(s). Look again at the log and/or output from the
 macro to verify that now, no sitespotid values are missing.;
-
+%idcheck(formC2);
 
 
 *Question 9. Enter the revised (corrected, updated, non-missing) sitespotid for the spot from the FormC2 data
-set that originally had a missing value for sitespotid. (Type carefully!) 
+set that originally had a missing value for sitespotid. (Type carefully!) ;
+PROC PRINT DATA = formC2;
+	WHERE c6 = 81 AND c5 = 7 AND c4 = .;
+RUN;
 
+*07K-081;
 
 *Question 10. Considering the study design and data structure, in which data set(s) do you expect to see
 repetition of sitespotid values? 
-A.	FormA3
-B.	FormB2
-C.	FormC2;
+A.	FormA3 -> NO
+B.	FormB2 -> NO
+C.	FormC2 -> YES; 
 
 *5.	For each data set where you do not expect repetition of sitespotid values, write and execute one PROC
 step that allows you to verify whether there is any duplication of sitespotid values.
 Hint: One approach is to use the NODUPKEY option in a PROC that is very familiar to you (albeit for a
 different use).;
 
+PROC SORT DATA = formA3 NODUPKEY OUT = formA3_nodup;
+	BY sitespotid;
+RUN;
+PROC SORT DATA = formB2 NODUPKEY OUT = formB2_nodup;
+	BY sitespotid;
+RUN;
 
+*log shows 0 records duplicated for both of these;
 
 
 *Question 11. Consider the data set(s) that you determined should not have any repetition of values in the
 sitespotid variable. In those data sets, are there any erroneously repeats of spotsiteid values? 
-A.	Yes
+
 B.	No;
 
 
