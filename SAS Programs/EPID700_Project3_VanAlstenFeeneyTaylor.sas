@@ -778,6 +778,7 @@ PROC FREQ DATA=ABC4;
 	TABLES _CHAR_ / LIST MISSPRINT;
 RUN;
 /**/
+
 /**/
 /**/
 /**/
@@ -789,10 +790,46 @@ RUN;
 ****************************************************************************;
 
 
-/**/
-/**/
-/**/
-/**/
+/*Part VIII. Creating a Codebook
+
+Knowing that you have not received a codebook for this data set
+(you only have questionnaires), you are dreading the task of creating one from scratch. 
+Luckily, a colleague has shared a macro that promises to make this task easier.
+
+1.	Open the program “codebook.sas.” There are detailed comments near the top of the
+program explaining various parameters you can specify for the macro.
+*/
+
+
+/*
+2.	Before you can call the codebook macro, you’ll first need to define this macro 
+in your SAS session. Within your Project 3 SAS program,
+write one statement that will execute the contents of the “codebook.sas” program.*/
+
+%INCLUDE "&newlibref.\codebook.sas";
+RUN;
+
+/*3.	Call the macro, specifying the data set name and increasing the widths of the 
+label and format fields to ensure the labels and formats are not truncated in the output 
+(consult the “codebook.sas” program for instructions on how to specify these and other parameters
+for the macro). You may specify additional parameters for the macro 
+to further customize the codebook if you would like, but you are not required to. */
+%codebook(data = ABC4,
+		  	maxfmts = 0,
+			w_format = 100,
+		    w_label = 100);
+
+
+/*4.	Use an ODS destination statement to output the codebook to a PDF file.
+			Name your codebook file “Project3_Codebook_GroupName.pdf.”*/
+ODS PDF FILE = "Project3_Codebook_GroupName.pdf";
+%codebook(data = ABC4,
+		  	maxfmts = 0,
+			w_format = 100,
+		    w_label = 100);
+ODS PDF CLOSE;
+
+
 /**/
 /**/
 /**/
