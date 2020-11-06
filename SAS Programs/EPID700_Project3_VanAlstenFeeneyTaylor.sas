@@ -674,12 +674,109 @@ RUN;
 * PART 7
 ****************************************************************************;
 
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
+/*Another important task in managing a data set can data de-identification. 
+As you can see by looking at the data collection forms (“FormA.pdf,” “FormB.pdf,” and “FormC.pdf”)
+the full CBIHS data sets contain sensitive data. In addition to HIV test results and 
+viral load data, the data sets include indications of behaviors that can be stigmatizing and illegal.
+
+When de-identifying data, 
+you’ll need to consider which variables will need to be dropped or masked. 
+You’ll need to exclude direct identifiers, of course, but you’ll also need take precautions 
+to prevent deductive disclosure of participants. The study design and setting should be considered 
+when making plans to de-identify data. In a venue-based survey such as this, for example,
+the combination of a spot name or location data along with age, sex, and an indicator of 
+employment at the spot could be sufficient to identify a respondent. A strategy for 
+de-identifying a data set will typically weigh, among other factors, the risks 
+of identification, the data safeguards to be used, and data use agreements.
+
+If your data set contains identifiers, 
+you could de-identify your data in a variety of ways.
+You could exclude the relevant variables or delete sensitive values 
+contained in them; you might recode values into coarser categories; 
+or you may use offsets to mask the values, preferably in a way that maintains
+the statistical properties of the original data. In the data set you received, 
+for example, I applied a random offset to the date variable c2.
+
+If the data collection tool for your study contains open-ended fields,
+your de-identification process should include manual checks for sensitive
+values in these fields. Be sure to check even fields were not intended to 
+contain sensitive data. Participants or study staff could have entered more 
+information than requested, or they may have recorded sensitive information in an incorrect field.
+
+One way to efficiently check for sensitive values in open-ended questions is 
+to generate frequency tables listing all the values of character variables in your data set.
+*/
+
+/* Question 17. Fill in the blank with just one term 
+(and not a macro variable) that will provide one-way frequency tables for all 
+character variables in the ABC3 data set:
+*/
+PROC FREQ DATA=ABC3;
+	TABLES _CHAR_ / LIST MISSPRINT;
+RUN;
+
+/*2.	Consult this list of direct identifiers from UNC’s IRB office.
+Look through the values from your Step VII.1 output and note whether the data values 
+contains any direct identifiers that are included on that list.
+
+• Names- NO
+• Geographic subdivisions smaller than a state - SPOTID potentially?
+• Zip codes -NO
+• All elements of dates except year directly related to an individual, including birth or
+death or dates of health care services or health care claims
+• Telephone numbers
+• Fax numbers
+• Electronic mail addresses
+• Social security numbers
+• Medical record numbers
+• Health plan beneficiary identifiers- NO
+• Account numbers - NO
+• Certificate/license numbers - NO
+• Vehicle identifiers and serial numbers, including license plate numbers - NO
+• Device identifiers and serial numbers - NO
+• Web universal resource locators (URL) -NO
+• Internet protocol (IP) address numbers -NO
+• Biometric identifiers, including finger and voice prints -NO
+• Full face photographic images -NO
+• Any other number, characteristic or code that could be used by the researcher to
+identify the individual -> Possibly; LANGUAGE? */
+
+
+/*Question 18. Does ABC3 contain any direct identifiers listed on the UNC IRB document provided? 
+A.	YES
+*/
+
+
+/*3.	In a new DATA step, create a new data set named ABC4, based on the following instructions:
+a.	If you determined that there were no direct identifiers in the data set, output ABC3 to ABC4 
+without any changes.
+b.	If you did find identifiers in ABC3, suppress any identifying data values by replacing 
+them with a SAS missing value appropriate for the variable type. (Consider referencing a
+participant’s values for c13 and/or sitespotid to identify individuals whose sensitive
+values are to be overwritten). Be sure to add a comment in your code explaining what you did.
+
+(Note: Any identifiers in the ABC3 data set are simulated for this project; they are not true values.)
+*/
+
+DATA ABC4;
+SET ABC3;
+
+	*because some of these languages might be spoken by only small groups 
+	of people (I don't know much about how common they are in the source populations)
+	language could potentially be an identifying characteristic.
+	Probably especially true of deafness which is pretty rare. Suppress those with "";
+
+	IF UPCASE(c10b) IN ('DEAF', 'DEEF', 'DUMP DEAF') THEN c10b = "";
+		ELSE c10b = c10b;
+
+RUN;
+
+
+/* Check that coding was done correctly*/
+
+PROC FREQ DATA=ABC4;
+	TABLES _CHAR_ / LIST MISSPRINT;
+RUN;
 /**/
 /**/
 /**/
