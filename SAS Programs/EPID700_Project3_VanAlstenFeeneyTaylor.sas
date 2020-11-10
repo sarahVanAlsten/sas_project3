@@ -1074,7 +1074,7 @@ DATA ABC6;
 	IF c18 IN(1,2) THEN fisherdata=1;
 RUN;
 PROC TABULATE data=ABC6 STYLE=[JUST=CENTER];
-	WHERE c10c=1 AND c5=1;
+	WHERE c10c=1 AND c5=2;
 	CLASS c10c c14 c11a;
 	VAR count consentHIV HIVpos secormore edudata fisher fisherdata c12 hfcountrycount;
 	TABLE (count="Total respondents")*(N='N'*f=8.)
@@ -1086,7 +1086,7 @@ PROC TABULATE data=ABC6 STYLE=[JUST=CENTER];
 		,
    		(c14 all) / STYLE=[JUST=center];
 	TITLE "East Africa Cross-Border Integrated Health Study (2016-2017)";
-	TITLE2 "Unweighted results from Malaba (Site 1)";
+	TITLE2 "Unweighted results from Busia (Site 2)";
 	FOOTNOTE "*Number of countries in which health services were received in preceding 12 months";
 RUN;
 
