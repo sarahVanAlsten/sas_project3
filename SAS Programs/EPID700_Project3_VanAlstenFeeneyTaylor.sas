@@ -1295,6 +1295,15 @@ file that can be read into either program.;
 *1.	Export your data set as a CSV file with formatted values (using the formats 
 already applied – no need to add more). Name the data file “Project3_Data_GroupName.csv.”
 Check the output data set to be sure you’ve written the formatted values to the CSV file.;
+PROC EXPORT DATA = ABC5
+  OUTFILE= "&libref.\Project3_Data_VanAlstenFeeneyTaylor.csv"
+  DBMS= CSV
+  LABEL
+  REPLACE;
+
+  PUTNAMES= yes;
+
+RUN;
 
 *2.	Next, encrypt the data file in a zip file for added security and faster upload/download
 times. Save your csv file to a zip file named “Project3_Data_GroupName.zip” and encrypt
