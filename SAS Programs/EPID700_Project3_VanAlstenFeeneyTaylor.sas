@@ -969,7 +969,7 @@ if you feel so inclined.) 18*/
 
 /*2.	Moving forward with the report, use any number of SAS procedures and DATA
 steps to create and output the following summary table, with no other output, 
-for the subset of data collected in Malaba (cross-border site ID = 1):*/
+for the subset of data collected in BUSIA (cross-border site ID = 2):*/
 
 ODS GRAPHICS OFF;            
 ODS EXCLUDE ALL; 
@@ -981,7 +981,7 @@ specified. Thus, need to exclude all output*/
 	/*i.	“Total number of spots listed” = The total number of unique spots in 
 	the cross-border site listed by community informants in Step 1 of the PLACE method*/
 	PROC FREQ DATA=formA3 NLEVELS;
-		WHERE a_siteid = 1;
+		WHERE a_siteid = 2;
    		TABLES spotid;
 		ODS OUTPUT NLEVELS= totalSpots;
 	RUN;
@@ -990,7 +990,7 @@ specified. Thus, need to exclude all output*/
 	for spot verification in Step 2 of the PLACE method, regardless of the outcome of verification 
 	(i.e., regardless of whether the spot was ultimately found, closed, a duplicate spot, etc.)*/
 	PROC FREQ DATA = formB2 NLEVELS;
-		WHERE b4 = 1;
+		WHERE b4 = 2;
 		TABLES sitespotid;
 		ODS OUTPUT NLEVELS = totalVisit;
 	RUN;
@@ -999,7 +999,7 @@ specified. Thus, need to exclude all output*/
 	spot verification in Step 2 of the PLACE method, the percent of spots that were classified 
 	as “found and operational.” Hint: see b9a. -> look for b9a =2*/
 	PROC FREQ DATA = formB2 NLEVELS;
-		WHERE b4 = 1 AND b9a = 2;
+		WHERE b4 = 2 AND b9a = 2;
 		TABLES sitespotid;
 		ODS OUTPUT NLEVELS = totalOper;
 	RUN;
@@ -1046,7 +1046,7 @@ RUN;
 
 PROC PRINT DATA = q192 NOOBS;
 	VAR Statistic Value;
-	TITLE "Summary Data for Cross-Border Site Malaba (Site 1)";
+	TITLE "Summary Data for Cross-Border Site Busia (Site 2)";
 RUN;
 
 *Question 20. According to your summary table, what was the total number of spots
