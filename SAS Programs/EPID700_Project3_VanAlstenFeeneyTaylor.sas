@@ -19,7 +19,7 @@ macro variable after the %let to make sure the correct library is specified;
 *%LET libref = z:\\OneDrive - University of North Carolina at Chapel Hill\PhD Courses\EPID 700\Project 3\sas_project3\Data;
 
 *for Nandi's library;
-*%LET libref = ;
+*%LET libref = C:\Users\ntayl\OneDrive\Documents\EPID700\Project\Project 3\Data;
 
 LIBNAME epid "&libref";
 
@@ -65,7 +65,7 @@ PROC IMPORT OUT= formC
 RUN;
 
 
-*•	In the FormC SAS data set, ensure that the DATE9. 
+*ï¿½	In the FormC SAS data set, ensure that the DATE9. 
 format is assigned to the variable c2 and that the TIME. format is assigned to variable c3. ;
 DATA formC;
 SET formC;
@@ -146,12 +146,12 @@ TITLE "Part 3";
 You determine that the error in the cross-border site Kirongwe
 (site ID: 20) will be problematic for future data processing, and
 so you request that the Kirongwe team re-key their Form A data. 
-They re-enter the values and send them to you in the file “KirongweA.txt.”
+They re-enter the values and send them to you in the file ï¿½KirongweA.txt.ï¿½
 
 *Explore whether there are any discrepancies between the original data from Kirongwe
 and this revised data file.;
 
-*1.	First, read the “KirongweA.txt” data file in as a SAS data set. Name your new SAS
+*1.	First, read the ï¿½KirongweA.txtï¿½ data file in as a SAS data set. Name your new SAS
 data set KirongweA.; 
 
 
@@ -516,8 +516,8 @@ B.	No;
 * PART 5
 ****************************************************************************;
 
-/*Now that you’ve created a common variable sitespotid uniquely identifying spots across
-the three data sets (FormA3, FormB2, and FormC2), you’re ready to merge all the records together,
+/*Now that youï¿½ve created a common variable sitespotid uniquely identifying spots across
+the three data sets (FormA3, FormB2, and FormC2), youï¿½re ready to merge all the records together,
 spot-by-spot.
 
 1.Merge the FormA3, FormB2, and FormC2 data together by sitespotid to create an output 
@@ -534,8 +534,8 @@ Exclude all spot data for spots where bio-behavioral interviews did not occur.)*
 /*c.	For spots where multiple bio-behavioral interviews were conducted, merge the
 FormA3 and FormB2 data sets for that spot onto every bio-behavioral interview record from that spot.
 (For example, if 6 people were interviewed at a spot with sitespotid 01K-033, you should have
-6 records in the ABC data set – one per Form C interview –
-and each of those 6 records should include 01K-033’s spot-level data from FormA3 and FormB2.)*/
+6 records in the ABC data set ï¿½ one per Form C interview ï¿½
+and each of those 6 records should include 01K-033ï¿½s spot-level data from FormA3 and FormB2.)*/
 
 
 /*d.	Output only the following variables to the ABC data set:
@@ -578,7 +578,7 @@ PROC CONTENTS DATA = ABC;
 RUN;
 
 *Question 12. How many observations are in your ABC data set?
-(Be sure you’ve followed the Step V.1 instructions carefully!) 11567 
+(Be sure youï¿½ve followed the Step V.1 instructions carefully!) 11567 
 
 Question 13. Would SAS have produced an output data set if you
 had excluded the BY statement in the DATA step you wrote in Part V.1? 
@@ -591,8 +591,8 @@ B.	No
 
 /*Part VI. Applying Labels and Formats
 Creating labels and user-defined formats for a large data set can be cumbersome.
-Fortunately, a colleague has shared two SAS program files for these tasks: “CBIHSApplyLF.sas” 
-and “CBIHSFormats.sas.”
+Fortunately, a colleague has shared two SAS program files for these tasks: ï¿½CBIHSApplyLF.sasï¿½ 
+and ï¿½CBIHSFormats.sas.ï¿½
 
 1.	Open these two SAS programs just to see what they contain. 
 Exit the files once you have an understanding of their contents. 
@@ -600,7 +600,7 @@ Exit the files once you have an understanding of their contents.
 
 2.	Return to your SAS program for Project 3. Write and 
 execute exactly one statement in your SAS program that will execute all the code in the
-“CBIHSFormats.sas” file.
+ï¿½CBIHSFormats.sasï¿½ file.
 */
 
 *file pointer -> update the base filepath;
@@ -610,11 +610,11 @@ RUN;
 
 %INCLUDE "&newlibref.\CBIHSFormats.sas";
 
-/*Question 14. What statement did you use to execute the code in the “CBIHSFormats.sas” file? 
+/*Question 14. What statement did you use to execute the code in the ï¿½CBIHSFormats.sasï¿½ file? 
 Enter the SAS keyword for the statement 
 (enter one word, including any relevant special characters): %INCLUDE */
 
-/*3.	In a new DATA step, use one statement to execute the contents of “CBIHSApplyLF.sas.”
+/*3.	In a new DATA step, use one statement to execute the contents of ï¿½CBIHSApplyLF.sas.ï¿½
 (Do not copy/paste the formats and labels into your Project 3 code.) 
 a.	Name the output data set ABC2.
 b.	Do not worry if the log alerts you to variables that are not included in your subset
@@ -675,13 +675,13 @@ RUN;
 ****************************************************************************;
 
 /*Another important task in managing a data set can data de-identification. 
-As you can see by looking at the data collection forms (“FormA.pdf,” “FormB.pdf,” and “FormC.pdf”)
+As you can see by looking at the data collection forms (ï¿½FormA.pdf,ï¿½ ï¿½FormB.pdf,ï¿½ and ï¿½FormC.pdfï¿½)
 the full CBIHS data sets contain sensitive data. In addition to HIV test results and 
 viral load data, the data sets include indications of behaviors that can be stigmatizing and illegal.
 
 When de-identifying data, 
-you’ll need to consider which variables will need to be dropped or masked. 
-You’ll need to exclude direct identifiers, of course, but you’ll also need take precautions 
+youï¿½ll need to consider which variables will need to be dropped or masked. 
+Youï¿½ll need to exclude direct identifiers, of course, but youï¿½ll also need take precautions 
 to prevent deductive disclosure of participants. The study design and setting should be considered 
 when making plans to de-identify data. In a venue-based survey such as this, for example,
 the combination of a spot name or location data along with age, sex, and an indicator of 
@@ -715,30 +715,30 @@ PROC FREQ DATA=ABC3;
 	TABLES _CHAR_ / LIST MISSPRINT;
 RUN;
 
-/*2.	Consult this list of direct identifiers from UNC’s IRB office.
+/*2.	Consult this list of direct identifiers from UNCï¿½s IRB office.
 Look through the values from your Step VII.1 output and note whether the data values 
 contains any direct identifiers that are included on that list.
 
-• Names- NO
-• Geographic subdivisions smaller than a state - SPOTID potentially?
-• Zip codes -NO
-• All elements of dates except year directly related to an individual, including birth or
+ï¿½ Names- NO
+ï¿½ Geographic subdivisions smaller than a state - SPOTID potentially?
+ï¿½ Zip codes -NO
+ï¿½ All elements of dates except year directly related to an individual, including birth or
 death or dates of health care services or health care claims
-• Telephone numbers - YES
-• Fax numbers
-• Electronic mail addresses
-• Social security numbers
-• Medical record numbers
-• Health plan beneficiary identifiers- NO
-• Account numbers - NO
-• Certificate/license numbers - NO
-• Vehicle identifiers and serial numbers, including license plate numbers - NO
-• Device identifiers and serial numbers - NO
-• Web universal resource locators (URL) -NO
-• Internet protocol (IP) address numbers -NO
-• Biometric identifiers, including finger and voice prints -NO
-• Full face photographic images -NO
-• Any other number, characteristic or code that could be used by the researcher to
+ï¿½ Telephone numbers - YES
+ï¿½ Fax numbers
+ï¿½ Electronic mail addresses
+ï¿½ Social security numbers
+ï¿½ Medical record numbers
+ï¿½ Health plan beneficiary identifiers- NO
+ï¿½ Account numbers - NO
+ï¿½ Certificate/license numbers - NO
+ï¿½ Vehicle identifiers and serial numbers, including license plate numbers - NO
+ï¿½ Device identifiers and serial numbers - NO
+ï¿½ Web universal resource locators (URL) -NO
+ï¿½ Internet protocol (IP) address numbers -NO
+ï¿½ Biometric identifiers, including finger and voice prints -NO
+ï¿½ Full face photographic images -NO
+ï¿½ Any other number, characteristic or code that could be used by the researcher to
 identify the individual -> Possibly; LANGUAGE where variations of deaf are listed */
 
 
@@ -752,7 +752,7 @@ a.	If you determined that there were no direct identifiers in the data set, outp
 without any changes.
 b.	If you did find identifiers in ABC3, suppress any identifying data values by replacing 
 them with a SAS missing value appropriate for the variable type. (Consider referencing a
-participant’s values for c13 and/or sitespotid to identify individuals whose sensitive
+participantï¿½s values for c13 and/or sitespotid to identify individuals whose sensitive
 values are to be overwritten). Be sure to add a comment in your code explaining what you did.
 
 
@@ -802,22 +802,22 @@ Knowing that you have not received a codebook for this data set
 (you only have questionnaires), you are dreading the task of creating one from scratch. 
 Luckily, a colleague has shared a macro that promises to make this task easier.
 
-1.	Open the program “codebook.sas.” There are detailed comments near the top of the
+1.	Open the program ï¿½codebook.sas.ï¿½ There are detailed comments near the top of the
 program explaining various parameters you can specify for the macro.
 */
 
 
 /*
-2.	Before you can call the codebook macro, you’ll first need to define this macro 
+2.	Before you can call the codebook macro, youï¿½ll first need to define this macro 
 in your SAS session. Within your Project 3 SAS program,
-write one statement that will execute the contents of the “codebook.sas” program.*/
+write one statement that will execute the contents of the ï¿½codebook.sasï¿½ program.*/
 
 %INCLUDE "&newlibref.\codebook.sas";
 RUN;
 
 /*3.	Call the macro, specifying the data set name and increasing the widths of the 
 label and format fields to ensure the labels and formats are not truncated in the output 
-(consult the “codebook.sas” program for instructions on how to specify these and other parameters
+(consult the ï¿½codebook.sasï¿½ program for instructions on how to specify these and other parameters
 for the macro). You may specify additional parameters for the macro 
 to further customize the codebook if you would like, but you are not required to. */
 %codebook(data = ABC4,
@@ -827,7 +827,7 @@ to further customize the codebook if you would like, but you are not required to
 
 
 /*4.	Use an ODS destination statement to output the codebook to a PDF file.
-			Name your codebook file “Project3_Codebook_GroupName.pdf.”*/
+			Name your codebook file ï¿½Project3_Codebook_GroupName.pdf.ï¿½*/
 ODS PDF FILE = "Project3_Codebook_VanAlstenFeeneyTaylor.pdf";
 %codebook(data = ABC4,
 		  	maxfmts = 0,
@@ -894,8 +894,8 @@ SET ABC4;
 	(conditionally, for the appropriate records) add the number of additional countries named 
 	in c120h to the value in hfcountrycount.
 	3.	Assume that any numeric responses in c120h indicate the number of additional
-	countries in which services were received. If c120h=0 (or “O,” potentially intended as a 0),
-	assume that the interviewer had erroneously selected “yes” to c120g, and do add anything to the 
+	countries in which services were received. If c120h=0 (or ï¿½O,ï¿½ potentially intended as a 0),
+	assume that the interviewer had erroneously selected ï¿½yesï¿½ to c120g, and do add anything to the 
 	value in hfcountrycount.
 	e.	Given that you manually checked the values in c120 and hard-coded changes 
 	to the hfcountrycount variable, add a comment to your code with a prominent
@@ -978,7 +978,7 @@ in a table and the ods selector can't get it if noprint option
 specified. Thus, need to exclude all output*/
 
 
-	/*i.	“Total number of spots listed” = The total number of unique spots in 
+	/*i.	ï¿½Total number of spots listedï¿½ = The total number of unique spots in 
 	the cross-border site listed by community informants in Step 1 of the PLACE method*/
 	PROC FREQ DATA=formA3 NLEVELS;
 		WHERE a_siteid = 2;
@@ -986,7 +986,7 @@ specified. Thus, need to exclude all output*/
 		ODS OUTPUT NLEVELS= totalSpots;
 	RUN;
 
-	/* ii.	“Number of spots visited for verification” = The total number of spots visited
+	/* ii.	ï¿½Number of spots visited for verificationï¿½ = The total number of spots visited
 	for spot verification in Step 2 of the PLACE method, regardless of the outcome of verification 
 	(i.e., regardless of whether the spot was ultimately found, closed, a duplicate spot, etc.)*/
 	PROC FREQ DATA = formB2 NLEVELS;
@@ -995,9 +995,9 @@ specified. Thus, need to exclude all output*/
 		ODS OUTPUT NLEVELS = totalVisit;
 	RUN;
 
-	/*iii.	“Percent of verified spots found and operational” = Among all spots visited for
+	/*iii.	ï¿½Percent of verified spots found and operationalï¿½ = Among all spots visited for
 	spot verification in Step 2 of the PLACE method, the percent of spots that were classified 
-	as “found and operational.” Hint: see b9a. -> look for b9a =2*/
+	as ï¿½found and operational.ï¿½ Hint: see b9a. -> look for b9a =2*/
 	PROC FREQ DATA = formB2 NLEVELS;
 		WHERE b4 = 2 AND b9a = 2;
 		TABLES sitespotid;
@@ -1108,9 +1108,9 @@ change a_siteid=1 to something like a_siteid=&siteid), whose value you can assig
 macro is called for a certain site.
 Hint: The PROC TABULATE code I gave in Part IX.3 has two references to site ID 
 (in the CLASS statement and the TITLE2 statement) and one reference to the site name 
-(in the TITLE2 statement). You’ll need to replace the value given for c5 (i.e., 1, 
-the site ID for Malaba) with a macro variable for the site ID, and you’ll need to 
-replace the site name “Malaba” with a macro variable for the site name.;
+(in the TITLE2 statement). Youï¿½ll need to replace the value given for c5 (i.e., 1, 
+the site ID for Malaba) with a macro variable for the site ID, and youï¿½ll need to 
+replace the site name ï¿½Malabaï¿½ with a macro variable for the site name.;
 
 %MACRO sitereport (bordersite);
 
@@ -1146,7 +1146,7 @@ specified. Thus, need to exclude all output*/
 		ODS OUTPUT NLEVELS= totalSpotsM;
 	RUN;
 
-	/* ii.	“Number of spots visited for verification” = The total number of spots visited
+	/* ii.	ï¿½Number of spots visited for verificationï¿½ = The total number of spots visited
 	for spot verification in Step 2 of the PLACE method, regardless of the outcome of verification 
 	(i.e., regardless of whether the spot was ultimately found, closed, a duplicate spot, etc.)*/
 	PROC FREQ DATA = formB2 NLEVELS;
@@ -1157,7 +1157,7 @@ specified. Thus, need to exclude all output*/
 
 	/*iii.	Percent of verified spots found and operational = Among all spots visited for
 	spot verification in Step 2 of the PLACE method, the percent of spots that were classified 
-	as “found and operational.” Hint: see b9a. -> look for b9a =2*/
+	as ï¿½found and operational.ï¿½ Hint: see b9a. -> look for b9a =2*/
 	PROC FREQ DATA = formB2 NLEVELS;
 		WHERE b4 = &sitenum. AND b9a = 2;
 		TABLES sitespotid;
@@ -1245,7 +1245,7 @@ b.	Write an ODS destination statement to write your output to a PDF. Apply the O
 JOURNAL in that ODS statement.
 c.	Your goal is to have one page per site, with both tables for a single site appearing
 on one page To do this, include the STARTPAGE=NEVER option in the ODS statement. Then, add
-the following ODS statement in your sitereport macro (it’ll run in open code, like other
+the following ODS statement in your sitereport macro (itï¿½ll run in open code, like other
 ODS statements) to tell SAS where to begin printing to a new page: ODS STARTPAGE=NOW
 d.	After the ODS PDF statement, call your sitereport macro for all 13 sites.
 e.	Immediately after the macro calls, close the ODS PDF destination.; 
@@ -1281,20 +1281,20 @@ for refusals of the HIV test or for differential sampling probabilities across p
 Site ID number: 13;
 
 
-*7.	Save the report you just generated as a PDF file named “Project3_Report_GroupName.pdf.”;
+*7.	Save the report you just generated as a PDF file named ï¿½Project3_Report_GroupName.pdf.ï¿½;
 
 
 ***************************************************************************
 * PART 10
 ****************************************************************************;
 
-*Now it’s time to pass the data set on to your collaborators. Your collaborators
-use STATA and Excel, so to keep things simple, you’ll export the data to a CSV 
+*Now itï¿½s time to pass the data set on to your collaborators. Your collaborators
+use STATA and Excel, so to keep things simple, youï¿½ll export the data to a CSV 
 file that can be read into either program.;
 
 *1.	Export your data set as a CSV file with formatted values (using the formats 
-already applied – no need to add more). Name the data file “Project3_Data_GroupName.csv.”
-Check the output data set to be sure you’ve written the formatted values to the CSV file.;
+already applied ï¿½ no need to add more). Name the data file ï¿½Project3_Data_GroupName.csv.ï¿½
+Check the output data set to be sure youï¿½ve written the formatted values to the CSV file.;
 PROC EXPORT DATA = ABC5
   OUTFILE= "&libref.\Project3_Data_VanAlstenFeeneyTaylor.csv"
   DBMS= CSV
@@ -1306,6 +1306,6 @@ PROC EXPORT DATA = ABC5
 RUN;
 
 *2.	Next, encrypt the data file in a zip file for added security and faster upload/download
-times. Save your csv file to a zip file named “Project3_Data_GroupName.zip” and encrypt
-the file with the password: 2+2...isfive! (be sure to include the “!”). Click here more 
+times. Save your csv file to a zip file named ï¿½Project3_Data_GroupName.zipï¿½ and encrypt
+the file with the password: 2+2...isfive! (be sure to include the ï¿½!ï¿½). Click here more 
 detailed instructions on preparing zip files.;
