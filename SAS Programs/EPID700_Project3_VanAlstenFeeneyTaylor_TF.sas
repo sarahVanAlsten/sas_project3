@@ -16,10 +16,10 @@ macro variable after the %let to make sure the correct library is specified;
 *%LET libref = C:\Users\Owner\OneDrive\Documents\UNC\CourseWork\FALL2020\EPID700\Projects\project3\sas_project3\Data;
 
 *for Tim's library;
-%LET libref = Z:\OneDrive - University of North Carolina at Chapel Hill\PhD Courses\EPID 700\Project 3\sas_project3\Data;
+%LET libref = W:\p3data;
 
 *for Nandi's library;
-*%LET libref = C:\Users\ntayl\OneDrive\Documents\EPID700\Project\Project 3\Data;
+*%LET libref = ;
 
 LIBNAME epid "&libref";
 
@@ -32,6 +32,7 @@ TITLE "PART 1";
 PROC IMPORT OUT= formA 
             DATAFILE= "&libref.\FormA.xls" 
             DBMS=EXCEL REPLACE;
+
      RANGE="DATA$"; 
      GETNAMES=YES;
      MIXED=NO;
@@ -39,6 +40,21 @@ PROC IMPORT OUT= formA
      USEDATE=YES;
      SCANTIME=YES;
 RUN;
+
+*read in the formA data FOR TIM;
+/*PROC IMPORT OUT= formA 
+            DATAFILE= "&libref.\FormA.xls" 
+            DBMS=XLS REPLACE;
+			SHEET="DATA";
+			GUESSINGROWS=2147483647;
+     RANGE="DATA$"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;*/
+
 
 *read in formB data;
 PROC IMPORT OUT= formB 
@@ -54,7 +70,6 @@ RUN;
 PROC IMPORT OUT= formC 
             DATAFILE= "&libref.\FormC.xlsx" 
             DBMS=EXCEL REPLACE;
-
      RANGE="FormC$"; 
      GETNAMES=YES;
      MIXED=NO;
@@ -65,7 +80,21 @@ PROC IMPORT OUT= formC
 RUN;
 
 
-*ï¿½	In the FormC SAS data set, ensure that the DATE9. 
+*read in formC data FOR TIM;
+/*PROC IMPORT OUT= formC 
+            DATAFILE= "&libref.\FormC.xlsx" 
+            DBMS=XLSX REPLACE;
+     *RANGE="FormC$"; 
+     *GETNAMES=YES;
+     *MIXED=NO;
+     *SCANTEXT=YES;
+     *USEDATE=YES;
+     *SCANTIME=YES;
+
+RUN;*/
+
+
+*•	In the FormC SAS data set, ensure that the DATE9. 
 format is assigned to the variable c2 and that the TIME. format is assigned to variable c3. ;
 DATA formC;
 SET formC;
@@ -95,7 +124,18 @@ RUN;
 QUIT;
 
 
+/*
+Question 1. What procedure did you use to report the contents of all three
+data sets with just one PROC step? (Enter only one word.) PROC DATASETS
 
+DATASETS
+
+Question 2. Using the output from the procedure you named in Question 1,
+report the number of observations in your FormB data set. 
+
+1160
+
+*/
 
 
 ***************************************************************************
@@ -118,7 +158,7 @@ SET forma_sort;
 		IF first.a_siteid THEN id_check = 1;
 			ELSE id_check = id_check + 1;
 
-		IF spotid NE id_check THEN DO;
+		IF id_check NE spotid THEN DO;
 			flag_spotid = 1;
 			*reset the checker so it isn't off for whole thing;
 			id_check = spotid;
@@ -131,11 +171,16 @@ SET forma_sort;
 
 RUN;
 
-
 PROC FREQ DATA = checkSpotIDs;
-	TABLES flag_spotid * a_siteid;
+	TABLES a_siteid* flag_spotid;
 RUN;
 
+/*Question 3. How many records in your CheckSpotIDs data set have
+a flag_spotid value of 1?  ANSWER: 3   */
+
+
+/*Question 4. How many cross-border sites have any records that have
+a flag_spotid value of 1? ANSWER: 2, sites 1 and 20   */
 
 ***************************************************************************
 * PART 3
@@ -146,12 +191,12 @@ TITLE "Part 3";
 You determine that the error in the cross-border site Kirongwe
 (site ID: 20) will be problematic for future data processing, and
 so you request that the Kirongwe team re-key their Form A data. 
-They re-enter the values and send them to you in the file ï¿½KirongweA.txt.ï¿½
+They re-enter the values and send them to you in the file “KirongweA.txt.”
 
 *Explore whether there are any discrepancies between the original data from Kirongwe
 and this revised data file.;
 
-*1.	First, read the ï¿½KirongweA.txtï¿½ data file in as a SAS data set. Name your new SAS
+*1.	First, read the “KirongweA.txt” data file in as a SAS data set. Name your new SAS
 data set KirongweA.; 
 
 
@@ -192,9 +237,7 @@ PROC COMPARE  BASE= formA_new_sort COMPARE= kirongweA_sort OUT = kcompare;
 RUN;
 
 *Question 5. What procedure did you use to create the kcompare data set?
-(Enter only one word.) PROC ;
-
-*compare;
+(Enter only one word.) PROC COMPARE;
 
 *4.	Print your kcompare data set. Take a close look at the data, noting which observations 
 are from the original FormA data set and which are from the re-keyed KirongweA data. Based on
@@ -223,6 +266,9 @@ from KirongweA. Name your new and improved FormA data set FormA2.;
 DATA FormA2;
 SET FormA (WHERE= (a_siteid NE 20)) KirongweA;
 RUN;
+
+PROC CONTENTS DATA=formA2;
+ RUN;
 
 *Question 7. How many observations are in your FormA2 data set? ;
 
@@ -342,7 +388,8 @@ b.	Print all records with missing sitespotid values.;
 
 *3.	Call the idcheck macro you wrote to check for missing sitespotid values in each of your new data sets:
 FormA3, FormB2, and FormC2.;
-OPTIONS MPRINT MLOGIC;
+options mprint mlogic;
+
 
 %MACRO idcheck(data);
 
@@ -431,7 +478,8 @@ OPTIONS MPRINT MLOGIC;
 %idcheck(data=FormB2);
 %idcheck(data=FormC2);
 
-*Question 8. Across FormA3, FormB2, and FormC2, how many observations have a missing value for sitespotid?;
+*Question 8. Across FormA3, FormB2, and FormC2, how many observations have a missing value for sitespotid?
+ANSWER:1 ;
 
 *4.	Investigate any missing sitespotid values. Consider the multistage design of this PLACE study and how
 you might leverage other data you have for a given spot to determine what any missing sitespotid should be.
@@ -453,7 +501,7 @@ RUN;
 
 *Form A and Form B suggest that site 7, spot 81 is in Kenya. Change form C missing
 to accomodate this
-a.	If you hard-code or overwrite any values, add comments to your code stating the originalvalue(s) and
+a.	If you hard-code or overwrite any values, add comments to your code stating the original value(s) and
 providing your rationale for the new value assigned.;
 DATA formC2;
 SET formC;
@@ -489,8 +537,7 @@ A.	FormA3 -> NO
 B.	FormB2 -> NO
 C.	FormC2 -> YES; 
 
-*5.	For each data set where you do not expect repetition of sitespotid values, write and 
-execute one PROC
+*5.	For each data set where you do not expect repetition of sitespotid values, write and execute one PROC
 step that allows you to verify whether there is any duplication of sitespotid values.
 Hint: One approach is to use the NODUPKEY option in a PROC that is very familiar to you (albeit for a
 different use).;
@@ -516,8 +563,8 @@ B.	No;
 * PART 5
 ****************************************************************************;
 
-/*Now that youï¿½ve created a common variable sitespotid uniquely identifying spots across
-the three data sets (FormA3, FormB2, and FormC2), youï¿½re ready to merge all the records together,
+/*Now that you’ve created a common variable sitespotid uniquely identifying spots across
+the three data sets (FormA3, FormB2, and FormC2), you’re ready to merge all the records together,
 spot-by-spot.
 
 1.Merge the FormA3, FormB2, and FormC2 data together by sitespotid to create an output 
@@ -534,8 +581,8 @@ Exclude all spot data for spots where bio-behavioral interviews did not occur.)*
 /*c.	For spots where multiple bio-behavioral interviews were conducted, merge the
 FormA3 and FormB2 data sets for that spot onto every bio-behavioral interview record from that spot.
 (For example, if 6 people were interviewed at a spot with sitespotid 01K-033, you should have
-6 records in the ABC data set ï¿½ one per Form C interview ï¿½
-and each of those 6 records should include 01K-033ï¿½s spot-level data from FormA3 and FormB2.)*/
+6 records in the ABC data set – one per Form C interview –
+and each of those 6 records should include 01K-033’s spot-level data from FormA3 and FormB2.)*/
 
 
 /*d.	Output only the following variables to the ABC data set:
@@ -578,7 +625,7 @@ PROC CONTENTS DATA = ABC;
 RUN;
 
 *Question 12. How many observations are in your ABC data set?
-(Be sure youï¿½ve followed the Step V.1 instructions carefully!) 11567 
+(Be sure you’ve followed the Step V.1 instructions carefully!) 11567 
 
 Question 13. Would SAS have produced an output data set if you
 had excluded the BY statement in the DATA step you wrote in Part V.1? 
@@ -591,8 +638,8 @@ B.	No
 
 /*Part VI. Applying Labels and Formats
 Creating labels and user-defined formats for a large data set can be cumbersome.
-Fortunately, a colleague has shared two SAS program files for these tasks: ï¿½CBIHSApplyLF.sasï¿½ 
-and ï¿½CBIHSFormats.sas.ï¿½
+Fortunately, a colleague has shared two SAS program files for these tasks: “CBIHSApplyLF.sas” 
+and “CBIHSFormats.sas.”
 
 1.	Open these two SAS programs just to see what they contain. 
 Exit the files once you have an understanding of their contents. 
@@ -600,7 +647,7 @@ Exit the files once you have an understanding of their contents.
 
 2.	Return to your SAS program for Project 3. Write and 
 execute exactly one statement in your SAS program that will execute all the code in the
-ï¿½CBIHSFormats.sasï¿½ file.
+“CBIHSFormats.sas” file.
 */
 
 *file pointer -> update the base filepath;
@@ -610,11 +657,11 @@ RUN;
 
 %INCLUDE "&newlibref.\CBIHSFormats.sas";
 
-/*Question 14. What statement did you use to execute the code in the ï¿½CBIHSFormats.sasï¿½ file? 
+/*Question 14. What statement did you use to execute the code in the “CBIHSFormats.sas” file? 
 Enter the SAS keyword for the statement 
 (enter one word, including any relevant special characters): %INCLUDE */
 
-/*3.	In a new DATA step, use one statement to execute the contents of ï¿½CBIHSApplyLF.sas.ï¿½
+/*3.	In a new DATA step, use one statement to execute the contents of “CBIHSApplyLF.sas.”
 (Do not copy/paste the formats and labels into your Project 3 code.) 
 a.	Name the output data set ABC2.
 b.	Do not worry if the log alerts you to variables that are not included in your subset
@@ -663,179 +710,112 @@ SET ABC2;
 
 RUN;
 
-/**/
-/**/
-/**/
-/**/
-/**/
-
 
 ***************************************************************************
-* PART 7
+* PART 7 De-identifying Data
 ****************************************************************************;
 
-/*Another important task in managing a data set can data de-identification. 
-As you can see by looking at the data collection forms (ï¿½FormA.pdf,ï¿½ ï¿½FormB.pdf,ï¿½ and ï¿½FormC.pdfï¿½)
-the full CBIHS data sets contain sensitive data. In addition to HIV test results and 
-viral load data, the data sets include indications of behaviors that can be stigmatizing and illegal.
+/*In a venue-based survey such as this, for example, the combination of a spot name or location
+data along with age, sex, and an indicator of employment at the spot could be sufficient to identify
+a respondent. A strategy for de-identifying a data set will typically weigh, among other factors,
+the risks of identification, the data safeguards to be used, and data use agreements.*/
 
-When de-identifying data, 
-youï¿½ll need to consider which variables will need to be dropped or masked. 
-Youï¿½ll need to exclude direct identifiers, of course, but youï¿½ll also need take precautions 
-to prevent deductive disclosure of participants. The study design and setting should be considered 
-when making plans to de-identify data. In a venue-based survey such as this, for example,
-the combination of a spot name or location data along with age, sex, and an indicator of 
-employment at the spot could be sufficient to identify a respondent. A strategy for 
-de-identifying a data set will typically weigh, among other factors, the risks 
-of identification, the data safeguards to be used, and data use agreements.
-
-If your data set contains identifiers, 
-you could de-identify your data in a variety of ways.
-You could exclude the relevant variables or delete sensitive values 
-contained in them; you might recode values into coarser categories; 
-or you may use offsets to mask the values, preferably in a way that maintains
-the statistical properties of the original data. In the data set you received, 
-for example, I applied a random offset to the date variable c2.
-
-If the data collection tool for your study contains open-ended fields,
-your de-identification process should include manual checks for sensitive
-values in these fields. Be sure to check even fields were not intended to 
-contain sensitive data. Participants or study staff could have entered more 
-information than requested, or they may have recorded sensitive information in an incorrect field.
-
-One way to efficiently check for sensitive values in open-ended questions is 
-to generate frequency tables listing all the values of character variables in your data set.
-*/
-
-/* Question 17. Fill in the blank with just one term 
-(and not a macro variable) that will provide one-way frequency tables for all 
-character variables in the ABC3 data set:
-*/
+/**/
 PROC FREQ DATA=ABC3;
-	TABLES _CHAR_ / LIST MISSPRINT;
+	TABLES _CHARACTER_ / LIST MISSPRINT;
 RUN;
 
-/*2.	Consult this list of direct identifiers from UNCï¿½s IRB office.
-Look through the values from your Step VII.1 output and note whether the data values 
-contains any direct identifiers that are included on that list.
+/*Question 17. Fill in the blank with just one term (and not a macro variable) that will provide one-way
+frequency tables for all character variables in the ABC3 data set:
+PROC FREQ DATA=ABC3;
+	TABLES _____ / LIST MISSPRINT;
+RUN;
 
-ï¿½ Names- NO
-ï¿½ Geographic subdivisions smaller than a state - SPOTID potentially?
-ï¿½ Zip codes -NO
-ï¿½ All elements of dates except year directly related to an individual, including birth or
-death or dates of health care services or health care claims
-ï¿½ Telephone numbers - YES
-ï¿½ Fax numbers
-ï¿½ Electronic mail addresses
-ï¿½ Social security numbers
-ï¿½ Medical record numbers
-ï¿½ Health plan beneficiary identifiers- NO
-ï¿½ Account numbers - NO
-ï¿½ Certificate/license numbers - NO
-ï¿½ Vehicle identifiers and serial numbers, including license plate numbers - NO
-ï¿½ Device identifiers and serial numbers - NO
-ï¿½ Web universal resource locators (URL) -NO
-ï¿½ Internet protocol (IP) address numbers -NO
-ï¿½ Biometric identifiers, including finger and voice prints -NO
-ï¿½ Full face photographic images -NO
-ï¿½ Any other number, characteristic or code that could be used by the researcher to
-identify the individual -> Possibly; LANGUAGE where variations of deaf are listed */
+
+ANSWER _character_*/
 
 
 /*Question 18. Does ABC3 contain any direct identifiers listed on the UNC IRB document provided? 
-A.	YES
-*/
+A.	Yes
+B.	No
 
+
+ANSWER: yes
+c10b: languages and hearing function (ie deaf individuals)
+
+c10d:
+No time now call my mobile number 0718408732
+
+*/
 
 /*3.	In a new DATA step, create a new data set named ABC4, based on the following instructions:
 a.	If you determined that there were no direct identifiers in the data set, output ABC3 to ABC4 
 without any changes.
-b.	If you did find identifiers in ABC3, suppress any identifying data values by replacing 
-them with a SAS missing value appropriate for the variable type. (Consider referencing a
-participantï¿½s values for c13 and/or sitespotid to identify individuals whose sensitive
-values are to be overwritten). Be sure to add a comment in your code explaining what you did.
 
-
-*person who gave cell number
-(Note: Any identifiers in the ABC3 data set are simulated for this project; they are not true values.)
-*/
+b.	If you did find identifiers in ABC3, suppress any identifying data values by replacing them with
+a SAS missing value appropriate for the variable type. (Consider referencing a participant’s values 
+for c13 and/or sitespotid to identify individuals whose sensitive values are to be overwritten). Be 
+sure to add a comment in your code explaining what you did.*/
 
 DATA ABC4;
-SET ABC3;
+	SET ABC3;
+	*removing identifiable values;
+	IF c10b="Deaf" OR c10b="Deef" OR c10b="Dump deaf" THEN c10b=" ";
+	IF c10d="No time now call my mobile number 0718408732" THEN c10d=" ";
+	RUN;
 
-	*because some of these languages might be spoken by only small groups 
-	of people (I don't know much about how common they are in the source populations)
-	language could potentially be an identifying characteristic.
-	Probably especially true of deafness which is pretty rare. Suppress those with "";
-
-	IF UPCASE(c10b) IN ('DEAF', 'DEEF', 'DUMP DEAF') THEN c10b = "";
-		ELSE c10b = c10b;
-
-	*person who gave cell number;
-	IF c10d = "No time now call my mobile number 0718408732" THEN c10d = "";
-		ELSE c10d = c10d;
-
+PROC FREQ DATA=ABC4; *rechecking to make sure the variable are deidentified;
+	TABLES _CHARACTER_ / LIST MISSPRINT;
 RUN;
 
-
-/* Check that coding was done correctly*/
-
-PROC FREQ DATA=ABC4;
-	TABLES _CHAR_ / LIST MISSPRINT;
-RUN;
-/**/
-
-/**/
-/**/
-/**/
-/**/
 
 
 ***************************************************************************
-* PART 8
+* PART 8 Creating a Codebook
 ****************************************************************************;
 
 
-/*Part VIII. Creating a Codebook
+/*1.	Open the program “codebook.sas.” There are detailed comments near the top of 
+the program explaining various parameters you can specify for the macro.
 
-Knowing that you have not received a codebook for this data set
-(you only have questionnaires), you are dreading the task of creating one from scratch. 
-Luckily, a colleague has shared a macro that promises to make this task easier.
+2.	Before you can call the codebook macro, you’ll first need to define this macro in 
+your SAS session. Within your Project 3 SAS program, write one statement that will execute
+the contents of the “codebook.sas” program.*/
 
-1.	Open the program ï¿½codebook.sas.ï¿½ There are detailed comments near the top of the
-program explaining various parameters you can specify for the macro.
-*/
+	%INCLUDE "&libref.\codebook.sas";
+	RUN;
 
-
-/*
-2.	Before you can call the codebook macro, youï¿½ll first need to define this macro 
-in your SAS session. Within your Project 3 SAS program,
-write one statement that will execute the contents of the ï¿½codebook.sasï¿½ program.*/
-
-%INCLUDE "&newlibref.\codebook.sas";
-RUN;
-
-/*3.	Call the macro, specifying the data set name and increasing the widths of the 
-label and format fields to ensure the labels and formats are not truncated in the output 
-(consult the ï¿½codebook.sasï¿½ program for instructions on how to specify these and other parameters
-for the macro). You may specify additional parameters for the macro 
-to further customize the codebook if you would like, but you are not required to. */
-%codebook(data = ABC4,
-		  	maxfmts = 0,
-			w_format = 100,
-		    w_label = 100);
+/*%macro codebook(
+	data=, 
+	library=work, 
+	maxfmts=0, 
+	def_othr=yes,
+    w_label=20, 
+	w_format=20, 
+	w_raw=9, 
+	addvalue=yes,
+	sortby=name,      /* sorby: name or varnum 
+	out=codebook ) ;*/
 
 
-/*4.	Use an ODS destination statement to output the codebook to a PDF file.
-			Name your codebook file ï¿½Project3_Codebook_GroupName.pdf.ï¿½*/
-ODS PDF FILE = "Project3_Codebook_VanAlstenFeeneyTaylor.pdf";
-%codebook(data = ABC4,
-		  	maxfmts = 0,
-			w_format = 100,
-		    w_label = 100);
-ODS PDF CLOSE;
+/*3.	Call the macro, specifying the data set name and increasing the widths of the
+	label and format fields to ensure the labels and formats are not truncated in the output
+	(consult the “codebook.sas” program for instructions on how to specify these and other
+	parameters for the macro). You may specify additional parameters for the macro to further
+	customize the codebook if you would like, but you are not required to. */
+OPTIONS MPRINT;
+	
 
 
+	ODS PDF FILE="&libref.\Project3_Codebook_VanAlstenFeeneyTaylor.PDF";
+%codebook(
+	data=ABC4,  
+	maxfmts=0,
+    w_label=100, 
+	w_format=100) ;
+	ODS PDF CLOSE;
+
+/**/
 /**/
 /**/
 /**/
@@ -848,206 +828,20 @@ ODS PDF CLOSE;
 * PART 9
 ****************************************************************************;
 
-
 /*1.	Among only those who consented to answering the bio-behavioral survey questions
 (in Form C), create a new variable, hfcountrycount, which is equal to the number of 
 countries in which the respondent reported receiving health services in the preceding
 12 months. Follow these instructions:*/
 
-*a.	Use a DATA step, and name your output data set ABC5.;
-DATA ABC5;
-SET ABC4;
-
-*b.	Use an ARRAY and a DO loop (and any other statements you need) in your DATA step.;
-	*c.	If any value among c120a, c120b, c120c, c120d, c120e, c120f, or c120g is 999 
-	(refused) or missing: hfcountrycount should be assigned a missing value;
-	*d.	If no value among c120a, c120b, c120c, c120d, c120e, c120f, or c120g is 999 
-	(refused) or missing: hfcountrycount should be set equal to the number of countries 
-	in which the participant reported receiving health services.;
-
-	hfcountrycount = 0;
-
-	ARRAY myarray c120a c120b c120d c120e c120f c120g;
-	ARRAY myarray2 c120aR c120bR c120dR c120eR c120fR c120gR;
-
-	DO i = 1 TO 6;
-		IF myarray[i] IN (999, .) THEN myarray2[i] = .;
-			ELSE myarray2[i] = myarray[i];
-
-		IF myarray2[i] = . THEN hfcountrycount = .;
-			ELSE IF myarray2[i] = 1 THEN hfcountrycount = hfcountrycount + 1;
-			ELSE hfcountrycount = hfcountrycount;
-
-	END;
-
-
-	*ii.c120g indicates if services were received in a country other than those specifically 
-	asked about in c120a through c120f. Respondents who said that they received services in 
-	any additional countries were asked to provide the names of those countries in c120h.
-	For these respondents, we need to review the values in c120h and manually update hfcountrycount
-	according to the number of countries listed. To do this, perform the following steps for any 
-	participants where c120g=1: ;
-	IF c120h NE "" THEN PUT sitespotid= c13= c120h=;
-
-
-	*2.	Based on the notes you find in the log, use the sitespotid and c13 values to 
-	(conditionally, for the appropriate records) add the number of additional countries named 
-	in c120h to the value in hfcountrycount.
-	3.	Assume that any numeric responses in c120h indicate the number of additional
-	countries in which services were received. If c120h=0 (or ï¿½O,ï¿½ potentially intended as a 0),
-	assume that the interviewer had erroneously selected ï¿½yesï¿½ to c120g, and do add anything to the 
-	value in hfcountrycount.
-	e.	Given that you manually checked the values in c120 and hard-coded changes 
-	to the hfcountrycount variable, add a comment to your code with a prominent
-	reminder that values in c120 and hfcountrycount must be re-checked and possibly 
-	updated if the source data files change.
-
-
-	*********************************************************************************
-	NOTE TO FUTURE USERS: The following observations had text entry for other countries
-	where healthcare was received. I manually added to the country counts the number of
-	distinct countries listed for each of the following participants. If survey or
-	data change, this coding may also need to change to accomodate updates. I assume
-	0 or "o" entries represent no other countries:
-
-	sitespotid=01K-066 c13=32002 c120h=Dubai Quater
-	sitespotid=01U-030 c13=21002 c120h=South Sudan
-	sitespotid=01U-042 c13=21006 c120h=South Sudan
-	sitespotid=01U-063 c13=32008 c120h=Sudan
-	sitespotid=02U-087 c13=73007 c120h=South Sudan
-	sitespotid=03U-085 c13=101009 c120h=Sudan
-	sitespotid=04K-014 c13=164010 c120h=Tunisia
-	sitespotid=04K-017 c13=166004 c120h=Mozambique
-	sitespotid=04K-022 c13=166006 c120h=India,  Dubai
-	sitespotid=04T-059 c13=150002 c120h=Oman
-	sitespotid=10U-002 c13=407001 c120h=1
-	sitespotid=10U-081 c13=402001 c120h=O
-	sitespotid=10U-088 c13=401008 c120h=South Africa
-	sitespotid=11K-060 c13=423005 c120h=South Africa
-	sitespotid=21U-010 c13=321004 c120h=Sudan
-	sitespotid=21U-097 c13=324002 c120h=Zimbabwe
-	sitespotid=21U-119 c13=325002 c120h=0
-	sitespotid=21U-119 c13=325008 c120h=Turkey
-****************************************************************;
-
-IF sitespotid="01K-066" AND c13=32002 THEN hfcountrycount = hfcountrycount + 2;
-	ELSE IF sitespotid="01U-030" AND c13=21002 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="01U-042" AND c13=21006 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="01U-063" AND c13=32008 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="02U-087" AND c13=73007 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="03U-085" AND c13=101009 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="04K-014" AND c13=164010 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="04K-017" AND c13=166004 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="04K-022" AND c13=166006 THEN hfcountrycount = hfcountrycount + 2;
-	ELSE IF sitespotid="04T-059" AND c13=150002 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="10U-002" AND c13=407001 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="10U-088" AND c13=401008 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="11K-060" AND c13=423005 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="21U-010" AND c13=321004 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="21U-097" AND c13=324002 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE IF sitespotid="21U-119" AND c13=325008 THEN hfcountrycount = hfcountrycount + 1;
-	ELSE hfcountrycount = hfcountrycount;
-
-
-RUN;
-
-*Check some of coding to see if done appropriately;
-PROC PRINT DATA = abc5 (OBS = 10);
-	VAR c120aR c120bR c120dR c120eR c120fR c120gR hfcountrycount;
-RUN;
-
-PROC PRINT DATA = abc5;
-	WHERE c120h NE "";
-	VAR c120aR c120bR c120dR c120eR c120fR c120gR c120h hfcountrycount;
-RUN;
-
-
 /*Question 19. For many observations did SAS print a note to the log (as per Step
 1.d.ii.2)? (You may add another note to your log in which you calculate this value,
-if you feel so inclined.) 18*/
+if you feel so inclined.) ____*/
 
 
 /*2.	Moving forward with the report, use any number of SAS procedures and DATA
 steps to create and output the following summary table, with no other output, 
-for the subset of data collected in BUSIA (cross-border site ID = 2):*/
+for the subset of data collected in Malaba (cross-border site ID = 1):*/
 
-ODS GRAPHICS OFF;            
-ODS EXCLUDE ALL; 
-/*NOTE: cannot just do noprint because NLEVELS is contained
-in a table and the ods selector can't get it if noprint option
-specified. Thus, need to exclude all output*/
-
-
-	/*i.	ï¿½Total number of spots listedï¿½ = The total number of unique spots in 
-	the cross-border site listed by community informants in Step 1 of the PLACE method*/
-	PROC FREQ DATA=formA3 NLEVELS;
-		WHERE a_siteid = 2;
-   		TABLES spotid;
-		ODS OUTPUT NLEVELS= totalSpots;
-	RUN;
-
-	/* ii.	ï¿½Number of spots visited for verificationï¿½ = The total number of spots visited
-	for spot verification in Step 2 of the PLACE method, regardless of the outcome of verification 
-	(i.e., regardless of whether the spot was ultimately found, closed, a duplicate spot, etc.)*/
-	PROC FREQ DATA = formB2 NLEVELS;
-		WHERE b4 = 2;
-		TABLES sitespotid;
-		ODS OUTPUT NLEVELS = totalVisit;
-	RUN;
-
-	/*iii.	ï¿½Percent of verified spots found and operationalï¿½ = Among all spots visited for
-	spot verification in Step 2 of the PLACE method, the percent of spots that were classified 
-	as ï¿½found and operational.ï¿½ Hint: see b9a. -> look for b9a =2*/
-	PROC FREQ DATA = formB2 NLEVELS;
-		WHERE b4 = 2 AND b9a = 2;
-		TABLES sitespotid;
-		ODS OUTPUT NLEVELS = totalOper;
-	RUN;
-
-ODS EXCLUDE NONE;  
- 
-
-
-
-
-
-*make a dataset that combines the 3 above datasets;
-DATA q19;
-	SET totalSpots totalVisit;
-
-	LENGTH Statistic $ 50;
-
-	IF TableVar = "spotid" THEN Statistic = "Total Number of Spots Visited";
-		ELSE Statistic = "Number of spots visited for verification";
-
-RUN;
-
-DATA q192;
-SET q19 totalOper;
-*both the totalvisit and totaloper use sitespotid. This will keep the two
-together so I can retain one to push forward as denominator for the percentage;
-BY DESCENDING TableVar;
-
-	RETAIN denominator;
-
-	*This brings forward the denominator;
-	IF first.TableVar THEN denominator = NLEVELS;
-
-	*only calculate the percentage for the place where 
-	we haven't specified string of definition yet;
-	IF TableVar = "sitesp" AND NOT first.TableVar THEN DO;
-		Statistic = "Percent of visited spots found and operational";
-		NLEVELS =ROUND(100*(NLEVELS/denominator));
-	END;
-
-	RENAME NLEVELS = Value;
-
-RUN;
-
-PROC PRINT DATA = q192 NOOBS;
-	VAR Statistic Value;
-	TITLE "Summary Data for Cross-Border Site Busia (Site 2)";
-RUN;
 
 *Question 20. According to your summary table, what was the total number of spots
 listed in Busia? N = ___  ;
@@ -1074,7 +868,7 @@ DATA ABC6;
 	IF c18 IN(1,2) THEN fisherdata=1;
 RUN;
 PROC TABULATE data=ABC6 STYLE=[JUST=CENTER];
-	WHERE c10c=1 AND c5=2;
+	WHERE c10c=1 AND c5=1;
 	CLASS c10c c14 c11a;
 	VAR count consentHIV HIVpos secormore edudata fisher fisherdata c12 hfcountrycount;
 	TABLE (count="Total respondents")*(N='N'*f=8.)
@@ -1086,14 +880,14 @@ PROC TABULATE data=ABC6 STYLE=[JUST=CENTER];
 		,
    		(c14 all) / STYLE=[JUST=center];
 	TITLE "East Africa Cross-Border Integrated Health Study (2016-2017)";
-	TITLE2 "Unweighted results from Busia (Site 2)";
+	TITLE2 "Unweighted results from Malaba (Site 1)";
 	FOOTNOTE "*Number of countries in which health services were received in preceding 12 months";
 RUN;
 
 
 *Question 23. According to the table you just produced, among female respondents
 in Malaba, what was the mean number of countries in which health services were 
-received in the preceding 12 months? Report the mean to 2 decimal places. Mean = 1.12  ;
+received in the preceding 12 months? Report the mean to 2 decimal places. Mean = ___  ;
 
 
 
@@ -1108,130 +902,9 @@ change a_siteid=1 to something like a_siteid=&siteid), whose value you can assig
 macro is called for a certain site.
 Hint: The PROC TABULATE code I gave in Part IX.3 has two references to site ID 
 (in the CLASS statement and the TITLE2 statement) and one reference to the site name 
-(in the TITLE2 statement). Youï¿½ll need to replace the value given for c5 (i.e., 1, 
-the site ID for Malaba) with a macro variable for the site ID, and youï¿½ll need to 
-replace the site name ï¿½Malabaï¿½ with a macro variable for the site name.;
-
-%MACRO sitereport (bordersite);
-
-	DATA _NULL_;
-
-		IF "&bordersite." = "Malaba" THEN CALL SYMPUT('sitenum', 1);
-			ELSE IF "&bordersite." = "Busia" THEN CALL SYMPUT('sitenum', 2);
-			ELSE IF "&bordersite." = "Katuna/Gatuna" THEN CALL SYMPUT('sitenum', 3);
-			ELSE IF "&bordersite." = "Holili/Taveta" THEN CALL SYMPUT('sitenum', 4);
-			ELSE IF "&bordersite." = "Port Victoria/Sio Port/Majanji" THEN CALL SYMPUT('sitenum', 5);
-			ELSE IF "&bordersite." = "Isebania/Sirare" THEN CALL SYMPUT('sitenum',7);
-			ELSE IF "&bordersite." = "Namanga" THEN CALL SYMPUT('sitenum', 9);
-			ELSE IF "&bordersite." = "Kagitumba/Miriama Hills" THEN CALL SYMPUT('sitenum',10);
-			ELSE IF "&bordersite." = "Mbita/Rusinga Island" THEN CALL SYMPUT('sitenum',11);
-			ELSE IF "&bordersite." = "Kasenyi" THEN CALL SYMPUT('sitenum', 12);
-			ELSE IF "&bordersite." = "Muhuru Bay" THEN CALL SYMPUT('sitenum', 13);
-			ELSE IF "&bordersite." = "Kirongwe" THEN CALL SYMPUT('sitenum', 20);
-			ELSE IF "&bordersite." = "Mutukula" THEN CALL SYMPUT('sitenum',21);
-	RUN;
-
-ODS GRAPHICS OFF;            
-ODS EXCLUDE ALL; 
-/*NOTE: cannot just do noprint because NLEVELS is contained
-in a table and the ods selector can't get it if noprint option
-specified. Thus, need to exclude all output*/
-
-
-	/*i.Total number of spots listed = The total number of unique spots in 
-	the cross-border site listed by community informants in Step 1 of the PLACE method*/
-	PROC FREQ DATA=formA3 NLEVELS;
-		WHERE a_siteid = &sitenum.;
-   		TABLES spotid;
-		ODS OUTPUT NLEVELS= totalSpotsM;
-	RUN;
-
-	/* ii.	ï¿½Number of spots visited for verificationï¿½ = The total number of spots visited
-	for spot verification in Step 2 of the PLACE method, regardless of the outcome of verification 
-	(i.e., regardless of whether the spot was ultimately found, closed, a duplicate spot, etc.)*/
-	PROC FREQ DATA = formB2 NLEVELS;
-		WHERE b4 = &sitenum.;
-		TABLES sitespotid;
-		ODS OUTPUT NLEVELS = totalVisitM;
-	RUN;
-
-	/*iii.	Percent of verified spots found and operational = Among all spots visited for
-	spot verification in Step 2 of the PLACE method, the percent of spots that were classified 
-	as ï¿½found and operational.ï¿½ Hint: see b9a. -> look for b9a =2*/
-	PROC FREQ DATA = formB2 NLEVELS;
-		WHERE b4 = &sitenum. AND b9a = 2;
-		TABLES sitespotid;
-		ODS OUTPUT NLEVELS = totalOperM;
-	RUN;
-
-ODS EXCLUDE NONE;  
-
-*make a dataset that combines the 3 above datasets;
-DATA q19M;
-	SET totalSpotsM totalVisitM;
-
-	LENGTH Statistic $ 50;
-
-	IF TableVar = "spotid" THEN Statistic = "Total Number of Spots Visited";
-		ELSE Statistic = "Number of spots visited for verification";
-
-RUN;
-
-DATA q192M;
-SET q19M totalOperM;
-*both the totalvisit and totaloper use sitespotid. This will keep the two
-together so I can retain one to push forward as denominator for the percentage;
-BY DESCENDING TableVar;
-
-	RETAIN denominator;
-
-	*This brings forward the denominator;
-	IF first.TableVar THEN denominator = NLEVELS;
-
-	*only calculate the percentage for the place where 
-	we havent specified string of definition yet;
-	IF TableVar = "sitesp" AND NOT first.TableVar THEN DO;
-		Statistic = "Percent of visited spots found and operational";
-		NLEVELS =ROUND(100*(NLEVELS/denominator));
-	END;
-
-	RENAME NLEVELS = Value;
-
-RUN;
-
-PROC PRINT DATA = q192M NOOBS;
-	VAR Statistic Value;
-	TITLE "Summary Data for Cross-Border Site &bordersite. (Site &sitenum.)";
-RUN;
-
-DATA ABC6;
-	SET ABC5;
-	IF c10c=1 THEN count=1;
-	IF c11a=1 THEN consentHIV=1;
-	IF c117b=1 THEN HIVpos=1;
-	IF 4<=c15<=6 THEN secormore=1;
-	IF 1<=c15<=6 THEN edudata=1;
-	IF c18=1 THEN fisher=1;
-	IF c18 IN(1,2) THEN fisherdata=1;
-RUN;
-PROC TABULATE data=ABC6 STYLE=[JUST=CENTER];
-	WHERE c10c=1 AND c5=&sitenum.;
-	CLASS c10c c14 c11a;
-	VAR count consentHIV HIVpos secormore edudata fisher fisherdata c12 hfcountrycount;
-	TABLE (count="Total respondents")*(N='N'*f=8.)
-	      (HIVpos="Reactive HIV test")*(N='N'*f=8. PCTN<consentHIV>='%'*f=12.2)
-      (secormore= "Secondary education or higher")*(N='N'*f=8. PCTN<edudata>='%'*f=12.2)
-	      (fisher= "Works in fishing industry")*(N='N'*f=8. PCTN<fisherdata>='%'*f=12.2)
-	      (c12="Age")*(MEAN= 'Mean' *f=12.2 STD= 'SD'*f=12.2)
-	      (hfcountrycount= "Countries received services in*")*(MEAN='Mean'*f=12.2 STD='SD'*f=12.2),
-   		(c14 all) / STYLE=[JUST=center];
-	TITLE "East Africa Cross-Border Integrated Health Study (2016-2017)";
-	TITLE2 "Unweighted results from &bordersite.(Site &sitenum.)";
-	FOOTNOTE "*Number of countries in which health services were received in preceding 12 months";
-RUN;
-
-ODS STARTPAGE=NOW;
-%MEND;
+(in the TITLE2 statement). You’ll need to replace the value given for c5 (i.e., 1, 
+the site ID for Malaba) with a macro variable for the site ID, and you’ll need to 
+replace the site name “Malaba” with a macro variable for the site name.;
 
 
 *5.	Run your sitereport macro code, %MACRO to %MEND, to define the sitereport macro.;
@@ -1245,67 +918,40 @@ b.	Write an ODS destination statement to write your output to a PDF. Apply the O
 JOURNAL in that ODS statement.
 c.	Your goal is to have one page per site, with both tables for a single site appearing
 on one page To do this, include the STARTPAGE=NEVER option in the ODS statement. Then, add
-the following ODS statement in your sitereport macro (itï¿½ll run in open code, like other
+the following ODS statement in your sitereport macro (it’ll run in open code, like other
 ODS statements) to tell SAS where to begin printing to a new page: ODS STARTPAGE=NOW
 d.	After the ODS PDF statement, call your sitereport macro for all 13 sites.
 e.	Immediately after the macro calls, close the ODS PDF destination.; 
 
-OPTIONS CENTER;
-ODS PDF FILE = "Project3_Report_VanAlstenFeeneyTaylor.pdf" STARTPAGE=NEVER;
-
-%sitereport(Malaba);
-%sitereport(Busia);
-%sitereport(Katuna/Gatuna);
-%sitereport(Holili/Taveta);
-%sitereport(Port Victoria/Sio Port/Majanji);
-%sitereport(Isebania/Sirare);
-%sitereport(Namanga);
-%sitereport(Kagitumba/Miriama Hills);
-%sitereport(Mbita/Rusinga Island);
-%sitereport(Kasenyi);
-%sitereport(Muhuru Bay);
-%sitereport(Kirongwe);
-%sitereport(Mutukula);
-
-ODS PDF CLOSE;
 
 *Question 24. According to your report, among the spots visited for verification 
 in Kirongwe, what percent of visited spots were found and operational? Report the
-percentage to the nearest integer. (Do not enter the percent sign.) 73 ;
+percentage to the nearest integer. (Do not enter the percent sign.) __% ;
 
 *Question 25. According to your report, which cross-border site had the highest
 overall prevalence of HIV among bio-behavioral survey participants? Provide the site
 ID number for that cross-border site.  (Interpretation note: I am requesting the 
 prevalence only among participants because we have not yet weighted these data to account
 for refusals of the HIV test or for differential sampling probabilities across participants.)
-Site ID number: 13;
+Site ID number: ;
 
 
-*7.	Save the report you just generated as a PDF file named ï¿½Project3_Report_GroupName.pdf.ï¿½;
+*7.	Save the report you just generated as a PDF file named “Project3_Report_GroupName.pdf.”;
 
 
 ***************************************************************************
 * PART 10
 ****************************************************************************;
 
-*Now itï¿½s time to pass the data set on to your collaborators. Your collaborators
-use STATA and Excel, so to keep things simple, youï¿½ll export the data to a CSV 
+*Now it’s time to pass the data set on to your collaborators. Your collaborators
+use STATA and Excel, so to keep things simple, you’ll export the data to a CSV 
 file that can be read into either program.;
 
 *1.	Export your data set as a CSV file with formatted values (using the formats 
-already applied ï¿½ no need to add more). Name the data file ï¿½Project3_Data_GroupName.csv.ï¿½
-Check the output data set to be sure youï¿½ve written the formatted values to the CSV file.;
-PROC EXPORT DATA = ABC5
-  OUTFILE= "&libref.\Project3_Data_VanAlstenFeeneyTaylor.csv"
-  DBMS= CSV
-  LABEL
-  REPLACE;
-
-  PUTNAMES= yes;
-
-RUN;
+already applied – no need to add more). Name the data file “Project3_Data_GroupName.csv.”
+Check the output data set to be sure you’ve written the formatted values to the CSV file.;
 
 *2.	Next, encrypt the data file in a zip file for added security and faster upload/download
-times. Save your csv file to a zip file named ï¿½Project3_Data_GroupName.zipï¿½ and encrypt
-the file with the password: 2+2...isfive! (be sure to include the ï¿½!ï¿½). Click here more 
+times. Save your csv file to a zip file named “Project3_Data_GroupName.zip” and encrypt
+the file with the password: 2+2...isfive! (be sure to include the “!”). Click here more 
 detailed instructions on preparing zip files.;
