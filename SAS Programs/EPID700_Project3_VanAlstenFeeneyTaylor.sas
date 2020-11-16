@@ -13,10 +13,10 @@ FOOTNOTE "EPID700_Project3_VanAlstenFeeneyTaylor.sas run at %SYSFUNC(DATETIME(),
 macro variable after the %let to make sure the correct library is specified;
 
 *for Sarah's library;
-*%LET libref = C:\Users\Owner\OneDrive\Documents\UNC\CourseWork\FALL2020\EPID700\Projects\project3\sas_project3\Data;
+%LET libref = C:\Users\Owner\OneDrive\Documents\UNC\CourseWork\FALL2020\EPID700\Projects\project3\sas_project3\Data;
 
 *for Tim's library;
-%LET libref = Z:\OneDrive - University of North Carolina at Chapel Hill\PhD Courses\EPID 700\Project 3\sas_project3\Data;
+*%LET libref = Z:\OneDrive - University of North Carolina at Chapel Hill\PhD Courses\EPID 700\Project 3\sas_project3\Data;
 
 *for Nandi's library;
 *%LET libref = C:\Users\ntayl\OneDrive\Documents\EPID700\Project\Project 3\Data;
